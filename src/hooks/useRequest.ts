@@ -1,7 +1,7 @@
 import { ref } from "vue";
 import type { Answer } from "src/api/client/base";
 
-export function useRequest<T>(cb: () => Answer<T>) {
+export function useRequest<T>(cb: () => Answer<T>, afterCb?: () => void) {
   const loading = ref(false);
 
   async function requestAsync() {
@@ -12,6 +12,9 @@ export function useRequest<T>(cb: () => Answer<T>) {
       console.error(e);
     } finally {
       loading.value = false;
+    }
+    if (afterCb) {
+      afterCb();
     }
   }
 

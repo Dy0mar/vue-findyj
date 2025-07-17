@@ -5,21 +5,24 @@ import PButton from "primevue/button";
 import PDrawer from "primevue/drawer";
 import { vacancyClient } from "src/api/client/vacancy";
 import { useRequest } from "src/hooks/useRequest";
+import { EventNames, useBus } from "src/hooks/useBus";
 import AddTitleStopWordDialog from "src/components/settings/AddTitleStopWordDialog.vue";
 import AddDescriptionStopWordDialog from "src/components/settings/AddDescriptionStopWordDialog.vue";
 
+const bus = useBus();
 const route = useRoute();
 const visible = defineModel<boolean>("visible", { required: true });
 const isAddTitleStopWordVisible = ref(false);
 const isAddDescriptionStopWordVisible = ref(false);
 
+const afterCb = () => bus.emit(EventNames.REFETCH_VACANCIES);
 const { requestAsync: applyDescriptionStopWord } = useRequest(() => {
   if (route.query.category) {
     return vacancyClient.applyDescriptionStopWord({ data: { category: String(route.query.category) } });
   }
   return vacancyClient.applyDescriptionStopWord();
-});
-const { requestAsync: applyTitleStopWord } = useRequest(vacancyClient.applyTitleStopWord.bind(vacancyClient));
+}, afterCb);
+const { requestAsync: applyTitleStopWord } = useRequest(vacancyClient.applyTitleStopWord.bind(vacancyClient), afterCb);
 </script>
 
 <template>
