@@ -1,25 +1,22 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
-import { useMutation } from "@tanstack/vue-query";
+import { ref } from "vue";
 import PInputText from "primevue/inputtext";
 import PPassword from "primevue/password";
 import PButton from "primevue/button";
-import type { SignInOptions } from "src/types/models/auth";
 import { supabase } from "src/api/client/supabase";
-import { authQuery } from "src/api/query/auth";
 import { useMessage } from "src/hooks/useMessage";
 
 const { errorMessage } = useMessage();
 
-const login = ref<SignInOptions["login"]>();
-const password = ref<SignInOptions["password"]>();
-
-const { data, mutateAsync, isPending, error, isSuccess } = useMutation(authQuery.login());
+const isPending = ref<boolean>(false);
+const login = ref<string>();
+const password = ref<string>();
 
 /**
  * @description Submit handler
  */
 async function onSubmit() {
+  isPending.value = true;
   if (password.value && login.value) {
     if (supabase) {
       const { error } = await supabase.auth.signInWithPassword({
@@ -31,24 +28,10 @@ async function onSubmit() {
       } else {
         window.location.assign("/");
       }
-    } else {
-      await mutateAsync({ password: password.value, login: login.value });
     }
   }
+  isPending.value = false;
 }
-
-watch(error, (value) => {
-  if (value) {
-    errorMessage(value.name, value.message);
-  }
-});
-
-watch([isSuccess, data], ([ok, value]) => {
-  if (ok && value) {
-    localStorage.setItem("token", value);
-    window.location.assign("/");
-  }
-});
 </script>
 
 <template>
