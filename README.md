@@ -1,45 +1,29 @@
-# frontend
+# Vacancy Dashboard
 
-This template should help get you started developing with Vue 3 in Vite.
+This is a simple personal pet project - a vacancy dashboard built with Vue 3. It allows me to manage and filter job vacancies scraped from external sources.
 
-## Recommended IDE Setup
+## ✨ Features
+### 📄 Displays a list of job vacancies
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+### ✅ Manage vacancy status (e.g., mark as banned, interesting, etc.)
 
-## Type Support for `.vue` Imports in TS
+### 🔍 Filter vacancies by status
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+### ❌ Add stop words for title and description to auto-ban irrelevant listings
 
-## Customize configuration
+## 🛠 Tech Stack
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+### Frontend
+- [Vue 3](https://vuejs.org/)
+- [PrimeVue](https://primevue.org/)
+- [TanStack Query](https://tanstack.com/query/latest)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [TypeScript](https://www.typescriptlang.org/)
 
-## Project Setup
+### Backend:
+- [Supabase Edge Functions](https://supabase.com/docs/guides/functions)
+- Supabase Database (PostgreSQL)
 
-```sh
-pnpm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
-pnpm dev
-```
-
-### Type-Check, Compile and Minify for Production
-
-```sh
-pnpm build
-```
-
-### Run Unit Tests with [Vitest](https://vitest.dev/)
-
-```sh
-pnpm test:unit
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-pnpm lint
-```
+## 🧠 Why I Built This
+My main goal was to deploy a full-stack app to Vercel using Edge Functions.
+I wanted a simple project to explore edge-first architecture while building something useful for myself - a dashboard to track and manage job vacancies.
