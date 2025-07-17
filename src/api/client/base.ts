@@ -47,11 +47,6 @@ axiosClient.interceptors.request.use(
       if (session) {
         config.headers.Authorization = `Bearer ${session.access_token}`;
       }
-    } else {
-      const token = localStorage.getItem("access_token");
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
     }
     return config;
   },

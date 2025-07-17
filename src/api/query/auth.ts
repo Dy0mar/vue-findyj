@@ -1,5 +1,3 @@
-import type { SignInOptions } from "src/types/models/auth";
-import type { UseMutationOptions } from "src/api/query/types";
 import { authClient } from "src/api/client/auth";
 
 class AuthQuery {
@@ -13,15 +11,6 @@ class AuthQuery {
       queryKey: ["api.auth.check"],
       queryFn: async () => (await this.client.check()).data,
     };
-  }
-
-  /**
-   * Login
-   */
-  login() {
-    return {
-      mutationFn: async (data) => (await this.client.login({ data })).data,
-    } satisfies UseMutationOptions<SignInOptions, string>;
   }
 }
 
