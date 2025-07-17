@@ -1,6 +1,5 @@
 import type { SignInOptions } from "src/types/models/auth";
-import type { CategoryDetailOut } from "src/types/models/crawler/category";
-import type { UseMutationOptions, UseQueryOptions } from "src/api/query/types";
+import type { UseMutationOptions } from "src/api/query/types";
 import { authClient } from "src/api/client/auth";
 
 class AuthQuery {
@@ -11,9 +10,9 @@ class AuthQuery {
    */
   check() {
     return {
-      queryKey: ["api.auth.me"],
+      queryKey: ["api.auth.check"],
       queryFn: async () => (await this.client.check()).data,
-    } satisfies UseQueryOptions<CategoryDetailOut[]>;
+    };
   }
 
   /**

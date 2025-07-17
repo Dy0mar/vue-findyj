@@ -1,5 +1,5 @@
 import type { VacancyStatus } from "src/constants";
-import type { CategoryDetailOut } from "src/types/models/crawler/category";
+import type { Category } from "src/types/models/crawler/category";
 
 export type VacancyStatusType = (typeof VacancyStatus)[keyof typeof VacancyStatus];
 
@@ -17,7 +17,7 @@ export type VacancyDetailOut = {
   cities: string;
   status_display: string;
   read: boolean;
-  category: CategoryDetailOut["name"];
+  category: Category["name"];
 };
 
 export type VacancyIn = Partial<Omit<VacancyDetailOut, "id">>;

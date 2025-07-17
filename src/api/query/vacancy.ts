@@ -16,7 +16,7 @@ type VacancyListQueryKey = readonly [
   typeof LIST_QUERY_KEY,
   VacancyDetailOut["status"],
   VacancyDetailOut["category"],
-  string,
+  string | undefined,
 ];
 
 class VacancyQuery {

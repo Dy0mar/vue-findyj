@@ -22,7 +22,15 @@ const category = computed(() => {
   return undefined;
 });
 
-const search = computed(() => route.query.search);
+const search = computed<string | undefined>(() => {
+  if (!route.query.search) {
+    return undefined;
+  }
+  if (Array.isArray(route.query.search)) {
+    return String(route.query.search[0]);
+  }
+  return String(route.query.search);
+});
 </script>
 
 <template>
