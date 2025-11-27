@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { VueQueryDevtools } from "@tanstack/vue-query-devtools";
 import { useQuery } from "@tanstack/vue-query";
 import toast from "primevue/toast";
 import { EventNames, useBus } from "src/hooks/useBus";
@@ -25,4 +26,5 @@ const { isSuccess, isFetched } = useQuery(authQuery.check());
   <AuthView v-else-if="isFetched" />
   <div v-else class="text-center">Loading...</div>
   <toast />
+  <VueQueryDevtools button-position="bottom-right" />
 </template>
