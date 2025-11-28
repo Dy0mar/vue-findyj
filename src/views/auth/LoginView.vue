@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import PInputText from "primevue/inputtext";
-import PPassword from "primevue/password";
-import PButton from "primevue/button";
+import InputText from "primevue/inputtext";
+import Password from "primevue/password";
+import Button from "primevue/button";
 import { supabase } from "src/api/client/supabase";
 import { useMessage } from "src/hooks/useMessage";
 
@@ -13,24 +13,22 @@ const login = ref<string>();
 const password = ref<string>();
 
 /**
- * @description Submit handler
+ * Sigh In
  */
-async function onSubmit() {
-  isPending.value = true;
+async function sighIn() {
   if (password.value && login.value) {
-    if (supabase) {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: login.value,
-        password: password.value,
-      });
-      if (error) {
-        errorMessage(error.name, error.message);
-      } else {
-        window.location.assign("/");
-      }
+    isPending.value = true;
+    const { error } = await supabase.auth.signInWithPassword({
+      email: login.value,
+      password: password.value,
+    });
+    if (error) {
+      errorMessage(error.name, error.message);
+    } else {
+      window.location.assign("/");
     }
+    isPending.value = false;
   }
-  isPending.value = false;
 }
 </script>
 
@@ -44,31 +42,25 @@ async function onSubmit() {
         <div class="text-surface-500">Enter the data</div>
       </div>
 
-      <form id="form" class="flex flex-col gap-4" @submit.prevent="onSubmit">
+      <form id="form" class="flex flex-col gap-4" @submit.prevent="sighIn">
         <div class="flex flex-col gap-2">
-          <template v-if="supabase">
-            <label for="email">Email</label>
-            <PInputText
-              id="email"
-              v-model="login"
-              type="email"
-              :disabled="isPending"
-              aria-placeholder="example@gmail.com"
-            />
-          </template>
-          <template v-else>
-            <label for="login">Login</label>
-            <PInputText id="login" v-model="login" :disabled="isPending" aria-placeholder="some hache here dude" />
-          </template>
+          <label for="email">Email</label>
+          <InputText
+            id="email"
+            v-model="login"
+            type="email"
+            :disabled="isPending"
+            aria-placeholder="example@gmail.com"
+          />
         </div>
 
         <div class="flex flex-col gap-2">
           <label for="password">Password</label>
-          <PPassword input-id="password" v-model="password" :feedback="false" :disabled="isPending" toggleMask fluid />
+          <Password input-id="password" v-model="password" :feedback="false" :disabled="isPending" toggleMask fluid />
         </div>
       </form>
 
-      <PButton label="Sign In" type="submit" form="form" :disabled="isPending" :loading="isPending" />
+      <Button label="Sign In" type="submit" form="form" :disabled="isPending" :loading="isPending" />
     </div>
   </div>
 </template>

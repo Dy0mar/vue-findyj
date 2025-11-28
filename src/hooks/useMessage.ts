@@ -1,5 +1,5 @@
-import { useToast } from "primevue";
 import type { ToastMessageOptions } from "primevue/toast";
+import { useToast } from "primevue/usetoast";
 
 export function useMessage() {
   const toast = useToast();
