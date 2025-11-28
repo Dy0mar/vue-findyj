@@ -7,7 +7,7 @@ import type {
   DescriptionStopWordIn,
   VacancyIn,
 } from "src/types/models/vacancy/vacancy";
-import type { UseInfiniteQueryOptions, UseMutationOptions } from "src/api/query/types";
+import type { Pages, UseInfiniteQueryOptions, UseMutationOptions } from "src/api/query/types";
 import { vacancyClient } from "src/api/client/vacancy";
 import { queryClient } from "src/queryClient";
 
@@ -53,15 +53,62 @@ class VacancyQuery {
       mutationFn: async ({ v_id, ...rest }) => {
         return await this.client.patchVacancy({ params: { v_id }, data: rest });
       },
-      onMutate: ({ v_id, status, read }) => {
-        queryClient.setQueryData([LIST_QUERY_KEY], (oldData?: VacancyDetailOut[]) => {
-          return (oldData || []).map((item) => {
-            if (status !== undefined) {
-              return item.v_id === v_id ? { ...item, status } : item;
-            }
-            return item.v_id === v_id ? { ...item, read } : item;
-          });
-        });
+      onMutate: async ({ v_id, status, read }) => {
+        await queryClient.cancelQueries({ queryKey: [LIST_QUERY_KEY] });
+
+        // mark read all cached vacancy in caches
+        if (read !== undefined) {
+          queryClient.setQueriesData<Pages<VacancyDetailOut>>(
+            { queryKey: [LIST_QUERY_KEY], exact: false },
+            (oldData) => {
+              if (!oldData?.pages) {
+                return oldData;
+              }
+
+              return {
+                ...oldData,
+                pages: oldData.pages.map((page) => ({
+                  ...page,
+                  items: page.items.map((item) => (item.v_id === v_id ? { ...item, read } : item)),
+                })),
+              };
+            },
+          );
+          // remove vacancy from all caches
+        } else if (status !== undefined) {
+          queryClient
+            .getQueriesData<Pages<VacancyDetailOut>>({ queryKey: [LIST_QUERY_KEY], exact: false })
+            .filter((scope) => (scope[0] as VacancyListQueryKey)[1] !== status)
+            .forEach((scope) => {
+              const oldData = scope[1];
+              if (!oldData?.pages) {
+                return;
+              }
+
+              const queryKey = scope[0] as VacancyListQueryKey;
+              queryClient.setQueryData<Pages<VacancyDetailOut>>(queryKey, (currentData) => {
+                if (!currentData?.pages) {
+                  return currentData;
+                }
+
+                const pages = currentData.pages.map((page) => {
+                  const found = page.items.find((item) => item.v_id === v_id);
+                  if (found) {
+                    return {
+                      items: page.items.filter((item) => item.v_id !== v_id),
+                      count: page.count - 1,
+                    };
+                  }
+                  return page;
+                });
+
+                return {
+                  ...currentData,
+                  pages,
+                };
+              });
+            });
+        }
       },
     } satisfies UseMutationOptions<
       { v_id: number; status?: VacancyIn["status"]; read?: VacancyIn["read"] },
