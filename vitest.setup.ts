@@ -14,8 +14,6 @@ import { server } from "test/utils/server";
 import { queryClient } from "src/queryClient";
 import "src/prototype";
 
-vi.stubEnv("VITE_BASE_URL", "/");
-
 // Router for the tests.
 const router = createRouterMock();
 
