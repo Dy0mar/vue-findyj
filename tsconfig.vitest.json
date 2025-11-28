@@ -1,11 +1,11 @@
 {
   "extends": "./tsconfig.app.json",
   "include": ["src/**/__tests__/*", "test/**/*", "src/**/*", "env.d.ts"],
-  "files": ["vite.config.ts", "vitest.config.ts"],
+  "files": ["vite.config.ts", "vitest.config.ts", "vitest.setup.ts"],
   "compilerOptions": {
     "paths": {
-      "src/*": ["./src/*"],
-      "test/*": ["./test/*"]
+      "src/*": ["src/*"],
+      "test/*": ["test/*"]
     },
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.vitest.tsbuildinfo",
 
