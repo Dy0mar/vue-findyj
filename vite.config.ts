@@ -33,6 +33,17 @@ export default defineConfig({
     manifest: true,
     emptyOutDir: true,
     target: "esnext",
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vue-vendor': ['vue', 'vue-router'],
+          'primevue': ['primevue'],
+          'query': ['@tanstack/vue-query'],
+          'supabase': ['@supabase/supabase-js'],
+          'axios': ['axios'],
+        },
+      },
+    },
   },
 });
 
