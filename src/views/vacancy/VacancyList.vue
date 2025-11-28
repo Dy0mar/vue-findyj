@@ -4,6 +4,7 @@ import { useInfiniteQuery, useMutation } from "@tanstack/vue-query";
 import PButton from "primevue/button";
 import type { VacancyDetailOut } from "src/types/models/vacancy/vacancy";
 import { EventNames, useBus } from "src/hooks/useBus";
+import { useMessage } from "src/hooks/useMessage";
 import { VacancyStatus } from "src/constants";
 import { vacancyQuery } from "src/api/query/vacancy";
 import VacancyCard from "src/views/vacancy/VacancyCard.vue";
@@ -18,14 +19,26 @@ const emit = defineEmits<{
   (e: "selected", value: VacancyDetailOut | undefined): void;
 }>();
 const bus = useBus();
+const { successMessage, errorMessage } = useMessage();
 
-const selected = ref<VacancyDetailOut["v_id"]>();
+const selected = ref<VacancyDetailOut>();
 const { mutateAsync: patchVacancy } = useMutation(vacancyQuery.patchVacancy());
 
 const { data, fetchNextPage, refetch, isFetching } = useInfiniteQuery(
   vacancyQuery.vacanciesList(toRef(props, "status"), toRef(props, "category"), toRef(props, "search")),
 );
-bus.on(EventNames.REFETCH_VACANCIES, refetch);
+/**
+ * Subscribe on bus event to refresh the vacancy list
+ * */
+bus.on(EventNames.REFETCH_VACANCIES, async () => {
+  try {
+    await refetch();
+    successMessage("Refresh success", "Vacancies refreshed successfully");
+  } catch (error) {
+    console.error(error);
+    errorMessage("Refresh failed", "Failed to refresh vacancies");
+  }
+});
 
 const vacancies = computed<VacancyDetailOut[]>(() => {
   if (data.value) {
@@ -34,25 +47,45 @@ const vacancies = computed<VacancyDetailOut[]>(() => {
   return [];
 });
 
-async function changeStatus({ v_id, status }: { v_id: VacancyDetailOut["v_id"]; status: VacancyDetailOut["status"] }) {
-  emit("selected", undefined);
-  await patchVacancy({ v_id, status });
-  await refetch();
+/**
+ * Change vacancy status
+ */
+async function changeStatus({ v_id, status }: VacancyDetailOut) {
+  selected.value = undefined;
+
+  try {
+    await patchVacancy({ v_id, status });
+    successMessage("Status change", "Vacancy status changed successfully");
+  } catch (error) {
+    console.error(error);
+    errorMessage("Status change failed", "Failed to change vacancy status");
+  }
 }
 
+/**
+ * Handle vacancy click event
+ */
 async function handleVacancyClick(vacancy: VacancyDetailOut) {
-  emit("selected", vacancy);
-  selected.value = vacancy.v_id;
+  selected.value = vacancy;
 
   if (!vacancy.read) {
-    await patchVacancy({ v_id: vacancy.v_id, read: true });
-    await refetch();
+    try {
+      await patchVacancy({ v_id: vacancy.v_id, read: true });
+    } catch (error) {
+      console.error(error);
+      errorMessage("Mark as read", "Something went wrong while marking vacancy as read. Please try again later.");
+    }
   }
 }
 
 const count = computed(() => (data.value ? data.value.pages[0].count : 0));
+
 watch(count, (value) => {
   bus.emit(EventNames.COUNT_VACANCIES, value);
+});
+
+watch(selected, (value) => {
+  emit("selected", value);
 });
 </script>
 
@@ -65,10 +98,10 @@ watch(count, (value) => {
       @change-status="changeStatus"
       @click="handleVacancyClick(vacancy)"
       :class="[
-        { 'bg-sky-300': vacancy.status === VacancyStatus.NEW && !vacancy.read && selected !== vacancy.v_id },
+        { 'bg-sky-300': vacancy.status === VacancyStatus.NEW && !vacancy.read && selected?.v_id !== vacancy.v_id },
         { 'bg-sky-50': vacancy.status === VacancyStatus.NEW },
         { 'bg-red-200': vacancy.status === VacancyStatus.BANNED },
-        { 'border border-pink-400': selected === vacancy.v_id },
+        { 'border border-pink-400 bg-pink-200': selected?.v_id === vacancy.v_id },
       ]"
     />
     <PButton

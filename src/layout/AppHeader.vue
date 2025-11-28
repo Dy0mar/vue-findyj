@@ -4,11 +4,11 @@ import { useQuery } from "@tanstack/vue-query";
 import { useRoute, useRouter } from "vue-router";
 import PButton from "primevue/button";
 import PInputText from "primevue/inputtext";
-import { EventNames, useBus } from "src/hooks/useBus";
 import { crawlerClient } from "src/api/client/crawler";
+import { categoryQuery } from "src/api/query/category";
+import { EventNames, useBus } from "src/hooks/useBus";
 import { useRequest } from "src/hooks/useRequest";
 import { VacancyStatus } from "src/constants";
-import { categoryQuery } from "src/api/query/category";
 
 const route = useRoute();
 const router = useRouter();
