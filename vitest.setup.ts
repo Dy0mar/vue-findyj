@@ -14,6 +14,15 @@ import { server } from "test/utils/server";
 import { queryClient } from "src/queryClient";
 import "src/prototype";
 
+vi.mock("@supabase/supabase-js", () => {
+  const mockClient = {
+    auth: {
+      getSession: vi.fn().mockResolvedValue({ data: { access_token: 'mock-test-token' } }),
+    },
+  };
+  return { createClient: vi.fn(() => mockClient) };
+});
+
 // Router for the tests.
 const router = createRouterMock();
 

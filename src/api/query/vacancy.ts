@@ -32,7 +32,7 @@ class VacancyQuery {
     search: Ref<string | undefined>,
   ) {
     return {
-      queryKey: ["api.vacancies", status, category, search],
+      queryKey: [LIST_QUERY_KEY, status, category, search],
       initialPageParam: 0,
       queryFn: async ({ queryKey, pageParam }) => {
         const [, status, category, search] = queryKey;
@@ -54,7 +54,7 @@ class VacancyQuery {
         return await this.client.patchVacancy({ params: { v_id }, data: rest });
       },
       onMutate: async ({ v_id, status, read }) => {
-        await queryClient.cancelQueries({ queryKey: [LIST_QUERY_KEY] });
+        await queryClient.cancelQueries({ queryKey: [LIST_QUERY_KEY], exact: false });
 
         // mark read all cached vacancy in caches
         if (read !== undefined) {
@@ -80,11 +80,6 @@ class VacancyQuery {
             .getQueriesData<Pages<VacancyDetailOut>>({ queryKey: [LIST_QUERY_KEY], exact: false })
             .filter((scope) => (scope[0] as VacancyListQueryKey)[1] !== status)
             .forEach((scope) => {
-              const oldData = scope[1];
-              if (!oldData?.pages) {
-                return;
-              }
-
               const queryKey = scope[0] as VacancyListQueryKey;
               queryClient.setQueryData<Pages<VacancyDetailOut>>(queryKey, (currentData) => {
                 if (!currentData?.pages) {
