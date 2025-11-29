@@ -1,5 +1,5 @@
-import type { VacancyStatus } from "src/constants";
 import type { Category } from "src/types/models/crawler/category";
+import { VacancyStatus } from "src/constants";
 
 export type VacancyStatusType = (typeof VacancyStatus)[keyof typeof VacancyStatus];
 

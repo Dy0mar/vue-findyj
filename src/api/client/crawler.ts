@@ -1,4 +1,4 @@
-import type { Category } from "src/types/models/crawler/category";
+import type { Category, ParsedResult } from "src/types/models/crawler/category";
 import { BaseAPIClient, BasePath } from "src/api/client/base";
 
 class Path extends BasePath {
@@ -14,7 +14,7 @@ class CrawlerClient extends BaseAPIClient {
 
   runParse(ctx?: { data: { category: Category["name"] } }) {
     const url = this.path.runParse();
-    return this.client.get(url, { params: ctx?.data });
+    return this.client.get<ParsedResult>(url, { params: ctx?.data });
   }
 }
 

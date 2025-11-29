@@ -25,6 +25,6 @@ const { isSuccess, isFetched } = useQuery(authQuery.check());
   </AppLayout>
   <AuthView v-else-if="isFetched" />
   <div v-else class="text-center">Loading...</div>
-  <toast />
+  <toast position="bottom-right" />
   <VueQueryDevtools button-position="bottom-right" />
 </template>

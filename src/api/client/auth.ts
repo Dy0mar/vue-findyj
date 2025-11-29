@@ -13,7 +13,7 @@ class AuthClient extends BaseAPIClient {
 
   check() {
     const url = this.path.check();
-    return this.client.get(url);
+    return this.client.get<{ message: "ok" }>(url);
   }
 }
 

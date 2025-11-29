@@ -29,7 +29,7 @@ beforeEach(() => {
 });
 
 beforeAll(() => {
-  // MSW can't fail test if it receives an unhandled request, instead it yells in the console.
+  // MSW can't fail a test if it receives an unhandled request, instead it yells in the console.
   // Make the yell more comprehensible.
   server.listen({
     onUnhandledRequest: (req) => {

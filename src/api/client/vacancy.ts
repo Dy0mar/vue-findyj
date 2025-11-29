@@ -43,7 +43,7 @@ class Path extends BasePath<URLParams> {
 class VacancyClient extends BaseAPIClient {
   path = new Path();
 
-  vacanciesList(ctx: { data: VacancyListQuery & { search: string | undefined; limit: number } }) {
+  vacanciesList(ctx: { data: VacancyListQuery & { search?: string; limit: number } }) {
     const url = this.path.vacanciesList();
     return this.client.get<Paginated<VacancyDetailOut>>(url, { params: ctx.data });
   }

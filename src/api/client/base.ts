@@ -38,22 +38,15 @@ const axiosClient = axios.create({
   },
 });
 
-axiosClient.interceptors.request.use(
-  async (config) => {
-    if (supabase) {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (session) {
-        config.headers.Authorization = `Bearer ${session.access_token}`;
-      }
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  },
-);
+axiosClient.interceptors.request.use(async (config) => {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  if (session) {
+    config.headers.Authorization = `Bearer ${session.access_token}`;
+  }
+  return config;
+});
 
 export abstract class BaseAPIClient<URL_TEMPLATE_PARAMS extends URLTemplateParams = never> {
   /**
