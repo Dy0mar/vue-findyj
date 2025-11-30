@@ -2,8 +2,8 @@
 import { computed, onMounted, ref, watch } from "vue";
 import { useQuery } from "@tanstack/vue-query";
 import { useRoute, useRouter } from "vue-router";
-import PButton from "primevue/button";
-import PInputText from "primevue/inputtext";
+import Button from "primevue/button";
+import InputText from "primevue/inputtext";
 import { crawlerClient } from "src/api/client/crawler";
 import { categoryQuery } from "src/api/query/category";
 import { EventNames, useBus } from "src/hooks/useBus";
@@ -73,7 +73,7 @@ watch(categories, async (value) => {
       <div class="flex items-center justify-between w-full h-16 gap-0 sm:gap-3">
         <div class="flex flex-row 3xl:flex-1 items-center items-centers space-x-8">
           <h1 class="text-lg text-nowrap text-zinc-100">Job tracker</h1>
-          <PInputText
+          <InputText
             v-model="term"
             placeholder="Search"
             size="small"
@@ -81,7 +81,7 @@ watch(categories, async (value) => {
           />
 
           <div class="flex space-x-4 items-center text-nowrap p-2 rounded-lg">
-            <PButton
+            <Button
               v-for="{ status, label } in statuses"
               :key="status"
               type="button"
@@ -89,16 +89,16 @@ watch(categories, async (value) => {
               size="small"
               variant="outlined"
               :class="{
-                'border-surface-600': $route.query.status !== status,
-                'border-pink-400': $route.query.status === status,
+                'border-surface-600': route.query.status !== status,
+                'border-pink-400': route.query.status === status,
               }"
               class="bg-surface-700/30 hover:border-pink-400 text-surface-400"
-              @click="$router.replace({ query: { ...$route.query, status: status } })"
+              @click="router.replace({ query: { ...route.query, status: status } })"
             />
           </div>
 
           <div class="flex space-x-4 items-center text-nowrap p-2 rounded-lg">
-            <PButton
+            <Button
               v-for="category in categories"
               :key="category"
               type="button"
@@ -106,17 +106,17 @@ watch(categories, async (value) => {
               size="small"
               variant="outlined"
               :class="{
-                'border-surface-600': $route.query.category !== category,
-                'border-pink-400': $route.query.category === category,
+                'border-surface-600': route.query.category !== category,
+                'border-pink-400': route.query.category === category,
               }"
               class="bg-surface-700/30 hover:border-pink-400 text-surface-400"
-              @click="$router.replace({ query: { ...$route.query, category } })"
+              @click="router.replace({ query: { ...route.query, category } })"
             />
           </div>
         </div>
 
         <div class="flex items-center gap-4">
-          <PButton
+          <Button
             type="button"
             label="Fetch new"
             size="small"
@@ -125,7 +125,7 @@ watch(categories, async (value) => {
             class="bg-surface-700/30 border-surface-600 hover:border-pink-400 text-surface-400"
             @click="runParse"
           />
-          <PButton
+          <Button
             type="button"
             label="settings"
             size="small"

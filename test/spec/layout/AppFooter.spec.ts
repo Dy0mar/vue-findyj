@@ -4,7 +4,6 @@ import { bus, EventNames } from "src/bus";
 import AppFooter from "src/layout/AppFooter.vue";
 
 describe("AppFooter", () => {
-
   it("should mount successfully", () => {
     const wrapper = mount(AppFooter);
     expect(wrapper.exists()).toBe(true);
