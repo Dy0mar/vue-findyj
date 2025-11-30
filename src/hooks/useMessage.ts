@@ -1,14 +1,13 @@
-import type { ToastMessageOptions } from "primevue/toast";
 import { useToast } from "primevue/usetoast";
 
 export function useMessage() {
   const toast = useToast();
 
-  function successMessage(summary?: ToastMessageOptions["summary"], detail?: ToastMessageOptions["detail"]) {
+  function successMessage(summary: string, detail: string) {
     toast.add({ severity: "success", summary, detail, life: 3000 });
   }
 
-  function errorMessage(summary?: ToastMessageOptions["summary"], detail?: ToastMessageOptions["detail"]) {
+  function errorMessage(summary: string, detail: string) {
     toast.add({ severity: "error", summary, detail, life: 3000 });
   }
 
