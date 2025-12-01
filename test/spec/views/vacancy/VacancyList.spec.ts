@@ -77,6 +77,14 @@ describe("VacancyList", () => {
     });
   });
 
+  it("api client should be called with optional search", async () => {
+    const spy = vi.spyOn(vacancyQuery.client, "vacanciesList");
+    await render({ props: { search: "foo" } });
+    expect(spy).toHaveBeenCalledExactlyOnceWith({
+      data: { ...options.props, search: "foo", limit: 10, offset: 0 },
+    });
+  });
+
   const loadMoreSelector = "[aria-label='Load more']";
 
   describe("empty pagination", () => {
