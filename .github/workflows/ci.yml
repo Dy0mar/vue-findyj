@@ -1,0 +1,33 @@
+name: CI Checks
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  test-and-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm ci
+
+      - name: Run Lint
+        run: pnpm run lint:oxlint && pnpm run lint:eslint
+
+      - name: Run Type Check
+        run: pnpm run type-check
+
+      - name: Run Tests
+        run: pnpm run test:ci
