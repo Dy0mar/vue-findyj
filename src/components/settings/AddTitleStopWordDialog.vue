@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { useMutation } from "@tanstack/vue-query";
 import { useMessage } from "src/hooks/useMessage";
+import { vacancyClient } from "src/api/client/vacancy";
 import { vacancyQuery } from "src/api/query/vacancy";
 import { useRequest } from "src/hooks/useRequest";
-import { vacancyClient } from "src/api/client/vacancy";
-import AddDialog from "src/components/settings/AddDialog.vue";
 import { useBus, EventNames } from "src/hooks/useBus";
+import AddDialog from "src/components/settings/AddDialog.vue";
 
 const bus = useBus();
 const { successMessage } = useMessage();

@@ -7,7 +7,7 @@ import { EventNames, useBus } from "src/hooks/useBus";
 import { authQuery } from "src/api/query/auth";
 import AppLayout from "src/layout/AppLayout.vue";
 import VacancyView from "src/views/vacancy/VacancyView.vue";
-import Settings from "src/components/settings/Settings.vue";
+import SettingsDrawer from "src/components/settings/SettingsDrawer.vue";
 import AuthView from "src/views/auth/AuthView.vue";
 
 const bus = useBus();
@@ -21,7 +21,7 @@ const { isSuccess, isFetched } = useQuery(authQuery.check());
 <template>
   <AppLayout v-if="isSuccess">
     <VacancyView />
-    <Settings v-model:visible="visible" />
+    <SettingsDrawer v-model:visible="visible" />
   </AppLayout>
   <AuthView v-else-if="isFetched" />
   <div v-else class="text-center">Loading...</div>
