@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import PButton from "primevue/button";
+import Button from "primevue/button";
 import type { VacancyDetailOut } from "src/types/models/vacancy/vacancy";
 import { VacancyStatus } from "src/constants";
 
@@ -16,7 +16,7 @@ const buttons = [
   { status: VacancyStatus.NOT_INTERESTING, label: "see later", severity: "secondary" },
   { status: VacancyStatus.BANNED, label: "ban!", severity: "danger" },
   { status: VacancyStatus.APPLIED, label: "applied", severity: "success" },
-];
+] as const;
 </script>
 
 <template>
@@ -39,7 +39,7 @@ const buttons = [
       </p>
 
       <div class="flex space-x-2 mt-4">
-        <PButton
+        <Button
           v-for="({ status, label, severity }, idx) in buttons"
           :key="label"
           size="small"

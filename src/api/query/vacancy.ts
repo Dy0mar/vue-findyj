@@ -10,6 +10,7 @@ import type {
 import type { Pages, UseInfiniteQueryOptions, UseMutationOptions } from "src/api/query/types";
 import { vacancyClient } from "src/api/client/vacancy";
 import { queryClient } from "src/queryClient";
+import { DEFAULT_PAGE_SIZE } from "src/constants";
 
 const LIST_QUERY_KEY = "api.vacancies";
 type VacancyListQueryKey = readonly [
@@ -21,7 +22,7 @@ type VacancyListQueryKey = readonly [
 
 class VacancyQuery {
   client = vacancyClient;
-  PER_PAGE = 10;
+  PER_PAGE = DEFAULT_PAGE_SIZE;
 
   /**
    * List of all vacancies

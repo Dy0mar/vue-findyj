@@ -10,6 +10,7 @@ import { CategoryFactory } from "test/utils/factories/category";
 import { HttpResponse, server } from "test/utils/server";
 import { aMounter } from "test/utils/options";
 import { AxiosResponseFactory } from "test/utils/factories/generic";
+import { getByAriaLabel } from "test/utils/selector";
 import AppHeader from "src/layout/AppHeader.vue";
 
 vi.spyOn(crawlerClient, "runParse");
@@ -148,8 +149,7 @@ describe("AppHeader", () => {
 
       // @ts-expect-error var statuses is private
       const label = wrapper.vm.statuses.find(({ status }) => status === VacancyStatus.APPLIED).label;
-      const statusButton = wrapper.find(`button[aria-label='${label}']`);
-      await statusButton?.trigger("click");
+      await getByAriaLabel(wrapper, label).trigger("click");
       expect(router.replace).toHaveBeenCalledWith({
         query: expect.objectContaining({ status: VacancyStatus.APPLIED }),
       });
@@ -159,8 +159,7 @@ describe("AppHeader", () => {
       const wrapper = await render();
 
       const label = categories[0].name;
-      const statusButton = wrapper.find(`button[aria-label='${label}']`);
-      await statusButton?.trigger("click");
+      await getByAriaLabel(wrapper, label).trigger("click");
       expect(router.replace).toHaveBeenCalledWith({
         query: expect.objectContaining({ category: label }),
       });

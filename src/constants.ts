@@ -8,3 +8,5 @@ export enum VacancyStatus {
   ENGLISH = "english",
   APPLIED = "applied",
 }
+
+export const DEFAULT_PAGE_SIZE = 10;

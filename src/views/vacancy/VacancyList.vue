@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, toRef, watch } from "vue";
 import { useInfiniteQuery, useMutation } from "@tanstack/vue-query";
-import PButton from "primevue/button";
+import Button from "primevue/button";
 import type { VacancyDetailOut } from "src/types/models/vacancy/vacancy";
 import { EventNames, useBus } from "src/hooks/useBus";
 import { useMessage } from "src/hooks/useMessage";
@@ -19,7 +19,7 @@ const emit = defineEmits<{
   (e: "selected", value: VacancyDetailOut | undefined): void;
 }>();
 const bus = useBus();
-const { successMessage, errorMessage } = useMessage();
+const { successMessage } = useMessage();
 
 const selected = ref<VacancyDetailOut>();
 const { mutateAsync: patchVacancy } = useMutation(vacancyQuery.patchVacancy());
@@ -29,15 +29,10 @@ const { data, fetchNextPage, refetch, isFetching } = useInfiniteQuery(
 );
 /**
  * Subscribe on bus event to refresh the vacancy list
- * */
+ */
 bus.on(EventNames.REFETCH_VACANCIES, async () => {
-  try {
-    await refetch();
-    successMessage("Refresh success", "Vacancies refreshed successfully");
-  } catch (error) {
-    console.error(error);
-    errorMessage("Refresh failed", "Failed to refresh vacancies");
-  }
+  await refetch();
+  successMessage("Refresh success", "Vacancies refreshed successfully");
 });
 
 const vacancies = computed<VacancyDetailOut[]>(() => {
@@ -52,14 +47,8 @@ const vacancies = computed<VacancyDetailOut[]>(() => {
  */
 async function changeStatus({ v_id, status }: VacancyDetailOut) {
   selected.value = undefined;
-
-  try {
-    await patchVacancy({ v_id, status });
-    successMessage("Status change", "Vacancy status changed successfully");
-  } catch (error) {
-    console.error(error);
-    errorMessage("Status change failed", "Failed to change vacancy status");
-  }
+  await patchVacancy({ v_id, status });
+  successMessage("Status change", "Vacancy status changed successfully");
 }
 
 /**
@@ -69,12 +58,7 @@ async function handleVacancyClick(vacancy: VacancyDetailOut) {
   selected.value = vacancy;
 
   if (!vacancy.read) {
-    try {
-      await patchVacancy({ v_id: vacancy.v_id, read: true });
-    } catch (error) {
-      console.error(error);
-      errorMessage("Mark as read", "Something went wrong while marking vacancy as read. Please try again later.");
-    }
+    await patchVacancy({ v_id: vacancy.v_id, read: true });
   }
 }
 
@@ -104,7 +88,7 @@ watch(selected, (value) => {
         { 'border border-pink-400 bg-pink-200': selected?.v_id === vacancy.v_id },
       ]"
     />
-    <PButton
+    <Button
       v-if="vacancies?.length < count && !isFetching"
       label="Load more"
       size="small"

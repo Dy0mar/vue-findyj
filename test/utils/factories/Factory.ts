@@ -2,6 +2,7 @@ import type { PartialDeep } from "type-fest";
 import { assign, isFunction, merge, range } from "lodash";
 import { faker } from "@faker-js/faker";
 import type { Paginated } from "src/types/models/extra";
+import { DEFAULT_PAGE_SIZE } from "src/constants";
 
 type FactoryDefaults<T> = PartialDeep<T> | ((sequence: number) => PartialDeep<T>);
 
@@ -75,10 +76,14 @@ export class Factory<T> {
    * Note: does not support next and previous links.
    * Note: while it is defined on base class, not every endpoint supports pagination.
    */
-  paginated(count: number = 1, pages: number = 1, strategy: "merge" | "replace" = "merge"): Paginated<T> {
+  paginated(
+    count: number = 1,
+    pageSize: number = DEFAULT_PAGE_SIZE,
+    strategy: "merge" | "replace" = "merge",
+  ): Paginated<T> {
     return {
-      count,
-      items: this.batch(count, undefined, strategy),
+      count: count,
+      items: this.batch(count > pageSize ? pageSize : count, undefined, strategy),
     };
   }
 }
