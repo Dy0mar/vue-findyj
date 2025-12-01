@@ -75,19 +75,21 @@ watch(selected, (value) => {
 
 <template>
   <div class="space-y-4">
-    <VacancyCard
-      v-for="vacancy in vacancies"
-      :key="vacancy.v_id"
-      :vacancy="vacancy"
-      @change-status="changeStatus"
-      @click="handleVacancyClick(vacancy)"
-      :class="[
-        { 'bg-sky-300': vacancy.status === VacancyStatus.NEW && !vacancy.read && selected?.v_id !== vacancy.v_id },
-        { 'bg-sky-50': vacancy.status === VacancyStatus.NEW },
-        { 'bg-red-200': vacancy.status === VacancyStatus.BANNED },
-        { 'border border-pink-400 bg-pink-200': selected?.v_id === vacancy.v_id },
-      ]"
-    />
+    <TransitionGroup name="slide-left" tag="div" class="space-y-4">
+      <VacancyCard
+        v-for="vacancy in vacancies"
+        :key="vacancy.v_id"
+        :vacancy="vacancy"
+        @change-status="changeStatus"
+        @click="handleVacancyClick(vacancy)"
+        :class="[
+          { 'bg-sky-300': vacancy.status === VacancyStatus.NEW && !vacancy.read && selected?.v_id !== vacancy.v_id },
+          { 'bg-sky-50': vacancy.status === VacancyStatus.NEW },
+          { 'bg-red-200': vacancy.status === VacancyStatus.BANNED },
+          { 'border border-pink-400 bg-pink-200': selected?.v_id === vacancy.v_id },
+        ]"
+      />
+    </TransitionGroup>
     <Button
       v-if="vacancies?.length < count && !isFetching"
       label="Load more"

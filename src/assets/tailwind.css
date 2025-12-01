@@ -1,2 +1,22 @@
 @import "tailwindcss";
 @import "tailwindcss-primeui";
+
+@layer utilities {
+  .slide-left-enter-active {
+    @apply transition-all duration-300 ease-out;
+  }
+  .slide-left-enter-from {
+    @apply opacity-0 translate-y-2;
+  }
+
+  .slide-left-leave-active {
+    @apply transition-all duration-300 ease-in relative;
+  }
+  .slide-left-leave-to {
+    @apply opacity-0 -translate-x-5;
+  }
+
+  .slide-left-move {
+    @apply transition-transform duration-300;
+  }
+}
