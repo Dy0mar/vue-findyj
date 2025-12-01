@@ -16,6 +16,13 @@ describe("AddDialog", () => {
     expect(wrapper.exists()).toBe(true);
   });
 
+  it("can update local visible", async () => {
+    const wrapper = await render({ props: { header: "Test Header", visible: false } });
+    wrapper.findComponent({ name: "Dialog" }).vm.$emit("update:visible", true);
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.visible).toBe(true);
+  });
+
   it.each(["Cancel", "Save", "Save and apply"])("has button '%s'", async (label) => {
     const wrapper = await render();
     expect(getByAriaLabel(wrapper, label).exists()).toBe(true);

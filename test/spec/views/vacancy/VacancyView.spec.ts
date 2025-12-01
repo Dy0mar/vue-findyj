@@ -4,10 +4,8 @@ import { sMounter } from "test/utils/options";
 import { VacancyStatus } from "src/constants";
 import VacancyView from "src/views/vacancy/VacancyView.vue";
 
-
 describe("VacancyView", () => {
-
-  const render = sMounter(VacancyView, { global: { stubs: { VacancyList: true } } })
+  const render = sMounter(VacancyView, { global: { stubs: { VacancyList: true } } });
 
   it("should render the component", () => {
     const wrapper = render();
@@ -21,45 +19,44 @@ describe("VacancyView", () => {
 
   it("iframe should be hidden", () => {
     const wrapper = render();
-    expect(wrapper.find('iframe').exists()).toBe(false);
+    expect(wrapper.find("iframe").exists()).toBe(false);
   });
 
   it("has the list when category is provided", async () => {
-    const router = getRouter()
-    await router.setQuery({ category: 'Python' })
+    const router = getRouter();
+    await router.setQuery({ category: "Python" });
     const wrapper = render();
     expect(wrapper.findComponent({ name: "VacancyList" }).exists()).toBe(true);
   });
 
-  it.each([ 'foo', ['foo', 'bar'] ])("should pass correct search prop", async (search) => {
-    const router = getRouter()
-    await router.setQuery({ category: 'Python', search })
+  it.each(["foo", ["foo", "bar"]])("should pass correct search prop", async (search) => {
+    const router = getRouter();
+    await router.setQuery({ category: "Python", search });
     const wrapper = render();
-    expect(wrapper.findComponent({ name: "VacancyList" }).props('search')).toBe("foo");
+    expect(wrapper.findComponent({ name: "VacancyList" }).props("search")).toBe("foo");
   });
 
   it("should pass correct src prop to iframe", async () => {
-    const router = getRouter()
-    await router.setQuery({ category: 'Python' })
+    const router = getRouter();
+    await router.setQuery({ category: "Python" });
     const wrapper = render();
-    wrapper.findComponent({ name: "VacancyList" }).vm.$emit('selected', { link: 'https://foo.bar' })
+    wrapper.findComponent({ name: "VacancyList" }).vm.$emit("selected", { link: "https://foo.bar" });
     await wrapper.vm.$nextTick();
-    expect(wrapper.find('iframe').attributes('src')).toBe('https://foo.bar');
+    expect(wrapper.find("iframe").attributes("src")).toBe("https://foo.bar");
   });
 
   it("should pass correct status to the list component", async () => {
-    const router = getRouter()
-    await router.setQuery({ category: 'Python', status: VacancyStatus.APPLIED })
+    const router = getRouter();
+    await router.setQuery({ category: "Python", status: VacancyStatus.APPLIED });
 
     const wrapper = render();
-    expect(wrapper.findComponent({ name: "VacancyList" }).props('status')).toBe(VacancyStatus.APPLIED);
+    expect(wrapper.findComponent({ name: "VacancyList" }).props("status")).toBe(VacancyStatus.APPLIED);
   });
 
   it("should pass default status to the list component when status is wrong", async () => {
-    const router = getRouter()
-    await router.setQuery({ category: 'Python', status: "foo" })
+    const router = getRouter();
+    await router.setQuery({ category: "Python", status: "foo" });
     const wrapper = render();
-    expect(wrapper.findComponent({ name: "VacancyList" }).props('status')).toBe(VacancyStatus.NEW);
+    expect(wrapper.findComponent({ name: "VacancyList" }).props("status")).toBe(VacancyStatus.NEW);
   });
-
 });
