@@ -3,7 +3,7 @@ import { resolve } from "path";
 
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
-import tailwindcss from '@tailwindcss/vite'
+import tailwindcss from "@tailwindcss/vite";
 
 const dst = resolve(__dirname, "dist");
 const host = "localhost";
@@ -36,14 +36,13 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          'vue-vendor': ['vue', 'vue-router'],
-          'primevue': ['primevue'],
-          'query': ['@tanstack/vue-query'],
-          'supabase': ['@supabase/supabase-js'],
-          'axios': ['axios'],
+          "vue-vendor": ["vue", "vue-router"],
+          primevue: ["primevue"],
+          query: ["@tanstack/vue-query"],
+          supabase: ["@supabase/supabase-js"],
+          axios: ["axios"],
         },
       },
     },
   },
 });
-

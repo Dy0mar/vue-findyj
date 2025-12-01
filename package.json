@@ -14,7 +14,9 @@
     "lint:oxlint": "oxlint . --fix -D correctness --ignore-path .gitignore",
     "lint:eslint": "eslint . --fix",
     "lint": "run-s lint:*",
-    "format": "prettier --write src/ test/"
+    "prettier:fix": "prettier '**/*.*' --write",
+    "prettier:check": "prettier . --check",
+    "ci": "run-s lint format type-check test:ci"
   },
   "dependencies": {
     "@fontsource/inter": "^5.2.8",

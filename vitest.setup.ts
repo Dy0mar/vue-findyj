@@ -17,7 +17,7 @@ import "src/prototype";
 vi.mock("@supabase/supabase-js", () => {
   const mockClient = {
     auth: {
-      getSession: vi.fn().mockResolvedValue({ data: { access_token: 'mock-test-token' } }),
+      getSession: vi.fn().mockResolvedValue({ data: { access_token: "mock-test-token" } }),
     },
   };
   return { createClient: vi.fn(() => mockClient) };

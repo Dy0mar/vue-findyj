@@ -1,4 +1,4 @@
-import { type DefaultBodyType, type StrictRequest, http } from "msw";
+import { http } from "msw";
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { HttpResponse, server } from "test/utils/server";

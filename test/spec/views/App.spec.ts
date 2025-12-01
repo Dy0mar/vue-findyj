@@ -1,12 +1,11 @@
 import { http } from "msw";
+import { flushPromises } from "@vue/test-utils";
 import { HttpResponse, server } from "test/utils/server";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { bus, EventNames } from "src/bus";
 import { authQuery } from "src/api/query/auth";
 import { sMounter } from "test/utils/options";
 import App from "src/App.vue";
-import Toast from "primevue/toast";
-import { flushPromises } from "@vue/test-utils";
 
 describe("App", () => {
   const render = sMounter(App, {

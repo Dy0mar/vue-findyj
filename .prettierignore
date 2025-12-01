@@ -1,0 +1,10 @@
+.idea
+.pnpm-store
+coverage
+dist
+node_modules
+.prettierignore
+pnpm-lock.yaml
+build-storybook.log
+.env*
+pnpm-workspace.yaml
