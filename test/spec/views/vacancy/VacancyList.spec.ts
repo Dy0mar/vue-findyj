@@ -171,8 +171,12 @@ describe("VacancyList", () => {
       await card1.trigger("click");
       await flushPromises();
       await wrapper.vm.$nextTick();
-      expect(card1.classes()).toContain("border-pink-400");
+      expect(card1.classes()).toContain("border-pink-600");
       expect(card1.classes()).toContain("bg-pink-200");
+      expect(
+        card1.classes().filter((token) => token.startsWith("bg")).length,
+        "should be only 1 background class",
+      ).toBe(1);
     });
 
     it("calls request on a card click", async () => {
