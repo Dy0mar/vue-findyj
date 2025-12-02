@@ -1,0 +1,9 @@
+{
+  "imports": {
+    "hono": "https://deno.land/x/hono@v4.3.11/mod.ts",
+    "hono/cors": "https://deno.land/x/hono@v4.3.11/middleware/cors/index.ts",
+    "hono/http-exception": "https://deno.land/x/hono@v4.3.11/http-exception.ts",
+    "deno-dom": "https://deno.land/x/deno_dom/deno-dom-wasm.ts",
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@v2.44.2"
+  }
+}
