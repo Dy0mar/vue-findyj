@@ -2,9 +2,13 @@
 .pnpm-store
 coverage
 dist
+public
 node_modules
 .prettierignore
 pnpm-lock.yaml
 build-storybook.log
 .env*
 pnpm-workspace.yaml
+.editorconfig
+.gitattributes
+.gitignore
