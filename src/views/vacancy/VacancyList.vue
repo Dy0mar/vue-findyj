@@ -62,7 +62,7 @@ async function handleVacancyClick(vacancy: VacancyDetailOut) {
   }
 }
 
-const count = computed(() => (data.value ? data.value.pages[0].count : 0));
+const count = computed(() => (data.value && data.value.pages[0] ? data.value.pages[0].count : 0));
 
 watch(count, (value) => {
   bus.emit(EventNames.COUNT_VACANCIES, value);

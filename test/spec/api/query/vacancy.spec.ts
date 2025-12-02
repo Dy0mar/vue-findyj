@@ -14,7 +14,7 @@ import { VacancyDetailOutFactory } from "test/utils/factories/vacancy";
 describe("vacancyQuery", () => {
   const query = vacancyQuery;
   const vacancies = new VacancyDetailOutFactory().paginated(2);
-  const vacancyId = vacancies.items[0].v_id;
+  const vacancyId = vacancies.items[0]!.v_id;
 
   const status = ref<VacancyDetailOut["status"]>(VacancyStatus.NEW);
   const category = ref<VacancyDetailOut["category"]>("Python");
@@ -133,11 +133,11 @@ describe("vacancyQuery", () => {
       } satisfies Pages<VacancyDetailOut>;
       queryClient.setQueryData(query.vacanciesList(status, category, search).queryKey, pages);
 
-      await query.patchVacancy().onMutate({ v_id: vacancies.items[0].v_id, read: true });
+      await query.patchVacancy().onMutate({ v_id: vacancies.items[0]!.v_id, read: true });
       const data = queryClient.getQueryData<Pages<VacancyDetailOut>>(
         query.vacanciesList(status, category, search).queryKey,
       );
-      expect(data?.pages[0].items[0]).toStrictEqual(expect.objectContaining({ read: true }));
+      expect(data?.pages[0]?.items[0]).toStrictEqual(expect.objectContaining({ read: true }));
     });
 
     it.each([
@@ -160,19 +160,18 @@ describe("vacancyQuery", () => {
 
     it("should remove from cache entries by id", async () => {
       const vacancies = new VacancyDetailOutFactory({ status: VacancyStatus.NEW }).paginated(2);
+      const v_id = vacancies.items[0]!.v_id;
       const pages = {
         pages: [vacancies],
         pageParams: [0],
       } satisfies Pages<VacancyDetailOut>;
       queryClient.setQueryData(query.vacanciesList(status, category, search).queryKey, pages);
 
-      await query.patchVacancy().onMutate({ v_id: vacancies.items[0].v_id, status: VacancyStatus.BANNED });
+      await query.patchVacancy().onMutate({ v_id, status: VacancyStatus.BANNED });
       const data = queryClient.getQueryData<Pages<VacancyDetailOut>>(
         query.vacanciesList(status, category, search).queryKey,
       );
-      expect(data?.pages[0].items).toEqual(
-        expect.not.arrayContaining([expect.objectContaining({ v_id: vacancies.items[0].v_id })]),
-      );
+      expect(data?.pages[0]?.items).toStrictEqual(expect.not.arrayContaining([expect.objectContaining({ v_id })]));
     });
 
     it("should not remove from cache entries by id if not found", async () => {
@@ -187,7 +186,7 @@ describe("vacancyQuery", () => {
       const data = queryClient.getQueryData<Pages<VacancyDetailOut>>(
         query.vacanciesList(status, category, search).queryKey,
       );
-      expect(data?.pages[0].items.length).toBe(2);
+      expect(data?.pages[0]?.items.length).toBe(2);
     });
   });
 });

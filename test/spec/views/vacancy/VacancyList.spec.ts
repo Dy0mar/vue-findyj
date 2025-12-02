@@ -157,24 +157,27 @@ describe("VacancyList", () => {
     it("the list has correct items classes", async () => {
       const wrapper = await render();
       const [card1, card2, card3] = wrapper.findAllComponents({ name: "VacancyCard" });
-      expect(card1.classes()).toContain("bg-sky-300");
-      expect(card2.classes()).toContain("bg-sky-50");
-      expect(card3.classes()).toContain("bg-red-200");
+      expect(card1).toBeDefined();
+      expect(card1!.classes()).toContain("bg-sky-300");
+      expect(card2!.classes()).toContain("bg-sky-50");
+      expect(card3!.classes()).toContain("bg-red-200");
     });
 
     it("the list has correct items classes when selected", async () => {
       const wrapper = await render();
       const [card1] = wrapper.findAllComponents({ name: "VacancyCard" });
-      expect(card1.classes()).not.toContain("border-pink-400");
-      expect(card1.classes()).not.toContain("bg-pink-200");
 
-      await card1.trigger("click");
+      expect(card1).toBeDefined();
+      expect(card1!.classes()).not.toContain("border-pink-400");
+      expect(card1!.classes()).not.toContain("bg-pink-200");
+
+      await card1!.trigger("click");
       await flushPromises();
       await wrapper.vm.$nextTick();
-      expect(card1.classes()).toContain("border-pink-600");
-      expect(card1.classes()).toContain("bg-pink-200");
+      expect(card1!.classes()).toContain("border-pink-600");
+      expect(card1!.classes()).toContain("bg-pink-200");
       expect(
-        card1.classes().filter((token) => token.startsWith("bg")).length,
+        card1!.classes().filter((token) => token.startsWith("bg")).length,
         "should be only 1 background class",
       ).toBe(1);
     });
@@ -183,7 +186,7 @@ describe("VacancyList", () => {
       const spy = vi.spyOn(vacancyQuery.client, "patchVacancy");
       const wrapper = await render();
       const [card1] = wrapper.findAllComponents({ name: "VacancyCard" });
-      await card1.trigger("click");
+      await card1?.trigger("click");
       await flushPromises();
       expect(spy).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ data: { read: true } }));
     });
@@ -192,7 +195,7 @@ describe("VacancyList", () => {
       const spy = vi.spyOn(vacancyQuery.client, "patchVacancy");
       const wrapper = await render();
       const [, card2] = wrapper.findAllComponents({ name: "VacancyCard" });
-      await card2.trigger("click");
+      await card2?.trigger("click");
       await flushPromises();
       expect(spy).not.toHaveBeenCalled();
     });
@@ -201,7 +204,7 @@ describe("VacancyList", () => {
       const spy = vi.spyOn(vacancyQuery.client, "patchVacancy");
       const wrapper = await render();
       const [card1] = wrapper.findAllComponents({ name: "VacancyCard" });
-      await card1.vm.$emit("change-status", { v_id: 2, status: VacancyStatus.APPLIED });
+      await card1?.vm.$emit("change-status", { v_id: 2, status: VacancyStatus.APPLIED });
       await flushPromises();
       expect(spy).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ data: { status: VacancyStatus.APPLIED } }));
     });

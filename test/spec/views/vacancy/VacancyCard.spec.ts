@@ -39,11 +39,11 @@ describe("VacancyCard", () => {
 
   it("should has cities", () => {
     const wrapper = render();
-    expect(wrapper.findAll("p")[0].text()).toContain(vacancy.cities);
+    expect(wrapper.findAll("p")[0]!.text()).toContain(vacancy.cities);
   });
   it("should has description", () => {
     const wrapper = render();
-    expect(wrapper.findAll("p")[1].text()).toContain(vacancy.description);
+    expect(wrapper.findAll("p")[1]!.text()).toContain(vacancy.description);
   });
 
   it("should has last button with specific class", () => {
@@ -76,7 +76,7 @@ describe("VacancyCard", () => {
       await getByAriaLabel(wrapper, button.label).trigger("click");
     }
     for (const [idx, button] of buttons) {
-      expect(wrapper.emitted("change-status")![0][idx]).toStrictEqual(
+      expect(wrapper.emitted("change-status")![0]![idx]).toStrictEqual(
         expect.objectContaining({ status: button.status }),
       );
     }

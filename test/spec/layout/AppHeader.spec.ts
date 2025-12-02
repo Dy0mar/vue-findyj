@@ -121,7 +121,7 @@ describe("AppHeader", () => {
       await render();
       expect(router.replace).toHaveBeenCalledWith({
         query: expect.objectContaining({
-          category: categories[0].name,
+          category: categories[0]!.name,
           status: VacancyStatus.NEW,
         }),
       });
@@ -158,7 +158,7 @@ describe("AppHeader", () => {
     it("should change query category on button click", async () => {
       const wrapper = await render();
 
-      const label = categories[0].name;
+      const label = categories[0]!.name;
       await getByAriaLabel(wrapper, label).trigger("click");
       expect(router.replace).toHaveBeenCalledWith({
         query: expect.objectContaining({ category: label }),
@@ -173,7 +173,7 @@ describe("AppHeader", () => {
       const wrapper = await render();
       const fetchButton = wrapper.findAll("button").find((btn) => btn.text() === "Fetch new");
       await fetchButton?.trigger("click");
-      expect(mockRunParse).toHaveBeenCalledExactlyOnceWith({ data: { category: categories[0].name } });
+      expect(mockRunParse).toHaveBeenCalledExactlyOnceWith({ data: { category: categories[0]!.name } });
     });
 
     it("should call request without params", async () => {
