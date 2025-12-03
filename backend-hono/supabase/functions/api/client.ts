@@ -2,7 +2,7 @@ import { type Context } from 'hono'
 import { createClient } from '@supabase/supabase-js'
 import type { Category, Vacancy } from "./types.ts";
 import { fetchVacancies } from "./parser.ts";
-import { findWordsInString } from "./utils.ts";
+import { findWordsInString } from "./utils/search.ts";
 import { VacancyStatus } from "./constants.ts";
 
 

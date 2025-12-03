@@ -10,7 +10,8 @@ import {
   getClient
 } from "./client.ts";
 import { loadVacancies } from "./client.ts";
-import { findWordsInString, sleep } from "./utils.ts";
+import { sleep } from "./utils/time.ts";
+import { findWordsInString } from "./utils/search.ts";
 import { extractJobDescription } from "./parser.ts";
 
 const api = new Hono()

@@ -18,9 +18,3 @@ export function findWordsInString(words: string[], str: string): string | null {
   return null
 }
 
-/**
- * Sleep.
- */
-export async function sleep(ms: number = 500): Promise<void> {
-  await new Promise((resolve) => setTimeout(resolve, ms));
-}

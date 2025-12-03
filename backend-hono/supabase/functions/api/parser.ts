@@ -2,7 +2,7 @@ import { HTTPException } from 'hono/http-exception'
 import { DOMParser, Element } from "deno-dom";
 import type { ParsedVacancy } from "./types.ts";
 import { SITE_URL } from "./constants.ts";
-import { sleep } from "./utils.ts";
+import { sleep } from "./utils/time.ts";
 
 const BASE_URL = SITE_URL
 
