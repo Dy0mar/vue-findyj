@@ -13,5 +13,5 @@ npx supabase functions serve api
 ## Running the tests
 
 ```bash
-deno test --config ./path-to/deno.json --allow-all ./path-to/tests/api-test.ts
+deno test --config ./path-to/deno.json --env-file=./path-to/.env.test --allow-all ./path-to/tests/
 ```
