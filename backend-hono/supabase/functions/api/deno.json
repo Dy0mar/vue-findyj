@@ -5,5 +5,15 @@
     "hono/http-exception": "https://deno.land/x/hono@v4.3.11/http-exception.ts",
     "deno-dom": "https://deno.land/x/deno_dom/deno-dom-wasm.ts",
     "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@v2.44.2"
+  },
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "lib": ["deno.window", "dom"]
+  },
+  "lint": {
+    "rules": {
+      "tags": ["recommended"]
+    }
   }
 }

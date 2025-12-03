@@ -1,8 +1,7 @@
-// supabase/functions/api/index.ts
-
-import { Hono } from 'hono'
+import { type Context, Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { HTTPException } from 'hono/http-exception'
+import type { Category, Vacancy } from "./types.ts";
 import { ALLOWED_ORIGINS, VacancyStatus } from "./constants.ts"
 import {
   fetchCategoryByName,
@@ -11,7 +10,6 @@ import {
   getClient
 } from "./client.ts";
 import { loadVacancies } from "./client.ts";
-import { Vacancy } from "./types.ts";
 import { findWordsInString, sleep } from "./utils.ts";
 import { extractJobDescription } from "./parser.ts";
 
@@ -29,7 +27,7 @@ api.use('*', cors({
 
 /** ------------ AUTH ------------ */
 
-api.get('/auth/check', async (c) => {
+api.get('/auth/check', (c: Context) => {
   return c.json({ message: "ok" }, 200)
 })
 
@@ -37,15 +35,15 @@ api.get('/auth/check', async (c) => {
 /** ------------ CATEGORIES ------------ */
 
 /** List of categories */
-api.get('/categories', async (c) => {
-  const { data } = await getClient(c).from("categories").select()
-  return c.json(data, 200)
+api.get('/categories', async (c: Context) => {
+  const { data } = await getClient(c).from("categories").select<string, Category>()
+  return c.json(data ?? [], 200)
 })
 
 /** ------------ CRAWLER ------------ */
 
 /** Add vacancies */
-api.get('/crawler/run-parse', async (c) => {
+api.get('/crawler/run-parse', async (c: Context) => {
   const { category } = c.req.query()
 
   const { data: categoryObj } = await fetchCategoryByName(c, category)
@@ -61,7 +59,7 @@ api.get('/crawler/run-parse', async (c) => {
 /** ------------ VACANCY ------------ */
 
 /** List of vacancies */
-api.get('/vacancy', async (c) => {
+api.get('/vacancy', async (c: Context) => {
   const { status, category, offset, limit, search } = c.req.query()
   const pageLimit = parseInt(limit) || 10;
   const pageOffset = parseInt(offset) || 0;
@@ -96,7 +94,7 @@ api.get('/vacancy', async (c) => {
 
 
 /** Update vacancy */
-api.patch('/vacancy/:v_id', async (c) => {
+api.patch('/vacancy/:v_id', async (c: Context) => {
   const v_id = Number(c.req.param('v_id'))
   const data = await c.req.json()
 
@@ -109,24 +107,24 @@ api.patch('/vacancy/:v_id', async (c) => {
 
 
 /** Apply title stop word */
-api.get('/vacancy/apply-title-stop-word', async (c) => {
+api.get('/vacancy/apply-title-stop-word', async (c: Context) => {
   const words = await fetchStopWords(c, "titlestopword")
 
   if (!words.length) {
     return c.json({ banned: 0 }, 200)
   }
   const client = getClient(c)
-  const { data }: { data: Vacancy[] } = await client.from("vacancies")
-    .select('v_id, title')
+  const { data } = await client.from("vacancies")
+    .select<string, Vacancy>('v_id, title')
     .neq("status", VacancyStatus.BANNED)
 
   const banned = data
-    .map(({ v_id, title }) => {
+    ?.map(({ v_id, title }): number | false => {
       return findWordsInString(words, title) !== null ? v_id : false
     })
-    .filter(Boolean);
+    .filter((value): value is number => typeof value !== "boolean");
 
-  if (banned.length > 0) {
+  if (banned && banned.length > 0) {
     await client.from("vacancies")
       .update({ status: VacancyStatus.BANNED })
       .in("v_id", banned)
@@ -135,7 +133,7 @@ api.get('/vacancy/apply-title-stop-word', async (c) => {
 })
 
 /** Add title stop word */
-api.post('/vacancy/title-stop-word', async (c) => {
+api.post('/vacancy/title-stop-word', async (c: Context) => {
   const data = await c.req.json()
   await getClient(c).from("titlestopword").upsert(data)
   return c.json(data, 200)
@@ -143,14 +141,14 @@ api.post('/vacancy/title-stop-word', async (c) => {
 
 
 /** Add description stop word */
-api.post('/vacancy/description-stop-word', async (c) => {
+api.post('/vacancy/description-stop-word', async (c: Context) => {
   const data = await c.req.json()
   await getClient(c).from("descriptionstopword").upsert(data)
   return c.json(data, 200)
 })
 
 /** Apply description stop word */
-api.get('/vacancy/apply-description-stop-word', async (c) => {
+api.get('/vacancy/apply-description-stop-word', async (c: Context) => {
   const { category } = c.req.query()
 
   const client = getClient(c)
@@ -186,6 +184,9 @@ api.get('/vacancy/apply-description-stop-word', async (c) => {
       removedVacancies.push(v.v_id)
       continue
     }
+    if (!desc) {
+      continue
+    }
 
     if (findWordsInString(words, desc.description)) {
       bannedVacancies.push(v.v_id)
@@ -195,8 +196,8 @@ api.get('/vacancy/apply-description-stop-word', async (c) => {
         .eq("id", v.v_id)
     }
     await sleep()
-
   }
+
   if (bannedVacancies.length > 0) {
     await client.from("vacancies")
       .update({ status: VacancyStatus.BANNED })
@@ -218,5 +219,6 @@ api.get('/vacancy/apply-description-stop-word', async (c) => {
 const app = new Hono()
 app.route('/api', api)
 
+export const myApp = app
 Deno.serve(app.fetch)
 

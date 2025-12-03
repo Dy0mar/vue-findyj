@@ -1,7 +1,7 @@
-export const ALLOWED_ORIGINS = Deno.env.get("ALLOWED_ORIGINS").split(",")
+export const ALLOWED_ORIGINS = Deno.env.get("ALLOWED_ORIGINS")!.split(",")
 
 /** PARSER */
-export const SITE_URL = Deno.env.get("SITE_URL")
+export const SITE_URL = Deno.env.get("SITE_URL")!
 
 
 export enum VacancyStatus {
@@ -14,4 +14,3 @@ export enum VacancyStatus {
   ENGLISH = "english",
   APPLIED = "applied",
 }
-

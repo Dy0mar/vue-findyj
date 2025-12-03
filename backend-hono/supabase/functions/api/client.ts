@@ -1,14 +1,15 @@
+import { type Context } from 'hono'
 import { createClient } from '@supabase/supabase-js'
+import type { Category, Vacancy } from "./types.ts";
 import { fetchVacancies } from "./parser.ts";
-import { Category } from "./types.ts";
 import { findWordsInString } from "./utils.ts";
 import { VacancyStatus } from "./constants.ts";
 
 
-export function getClient(context) {
+export function getClient(context: Context) {
   return createClient(
-    Deno.env.get("SUPABASE_URL"),
-    Deno.env.get("SUPABASE_ANON_KEY"),
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_ANON_KEY")!,
     {
       global: {
         headers: {
@@ -19,34 +20,33 @@ export function getClient(context) {
   )
 }
 
-export function fetchVacanciesByCategoryId(c, category_id: number, field="*") {
+export function fetchVacanciesByCategoryId(c: Context, category_id: number, field="*") {
   return getClient(c)
     .from("vacancies")
-    .select(`${field}, categories(name)`, { count: "exact" })
+    .select<string, Vacancy>(`${field}, categories(name)`, { count: "exact" })
     .eq('category_id', category_id);
 }
 
-export function fetchCategoryByName(c, category): Promise<{data: Category}> {
+export function fetchCategoryByName(c: Context, category: string) {
   return getClient(c)
     .from("categories")
-    .select("*")
+    .select<string, Category>("*")
     .eq("name", category)
     .single();
 }
 
-export async function fetchStopWords(c, table: "titlestopword" | "descriptionstopword"): Promise<string[]> {
-  const { data: rawWords } = await getClient(c).from(table).select('word')
+export async function fetchStopWords(c: Context, table: "titlestopword" | "descriptionstopword"): Promise<string[]> {
+  const { data: rawWords } = await getClient(c).from(table).select<string, { id: number, word: string }>('word')
   return rawWords?.map(({ word }) => word) || [];
 }
 
-export async function loadVacancies(c, category: Category) {
+export async function loadVacancies(c: Context, category: Category) {
   const { data: catItems, error: vacError } = await fetchVacanciesByCategoryId(c, category.id, "v_id")
   if (vacError) {
     throw vacError
   }
 
   const client = getClient(c)
-
   const ids_ = catItems?.map(({ v_id }) => v_id) ?? []
   const allVacancies = await fetchVacancies(category.name)
   const words = await fetchStopWords(c, "titlestopword")
