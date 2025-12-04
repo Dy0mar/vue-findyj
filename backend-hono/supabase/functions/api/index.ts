@@ -173,13 +173,17 @@ api.get('/vacancy/apply-description-stop-word', async (c: Context) => {
     throw error
   }
 
-  const vacancies: Vacancy[] = data ?? []
+  const vacancies = data
 
   const words = await fetchStopWords(c, "descriptionstopword")
   const bannedVacancies = []
   const removedVacancies = []
 
   for (const v of vacancies) {
+    if (!v.link) {
+      continue
+    }
+
     const desc = await extractJobDescription(v.link)
     if (!desc && v.status !== VacancyStatus.APPLIED) {
       removedVacancies.push(v.v_id)

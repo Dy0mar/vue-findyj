@@ -1,19 +1,20 @@
-import { type Context } from 'hono'
+import type { Context } from 'hono'
 import { createClient } from '@supabase/supabase-js'
 import type { Category, Vacancy } from "./types.ts";
+import type { Database } from './database.types.ts'
 import { fetchVacancies } from "./parser.ts";
 import { findWordsInString } from "./utils/search.ts";
 import { VacancyStatus } from "./constants.ts";
 
 
-export function getClient(context: Context) {
-  return createClient(
+export function getClient(context?: Context) {
+  return createClient<Database>(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_ANON_KEY")!,
     {
       global: {
         headers: {
-          Authorization: context.req.header('authorization') ?? '',
+          Authorization: context?.req.header('authorization') ?? '',
         },
       },
     }
