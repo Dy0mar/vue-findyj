@@ -4,11 +4,13 @@ import { type SupabaseClient } from 'npm:@supabase/supabase-js'
 
 type NoId<T> = T & { id?: never };
 type WithoutId = Record<string, unknown> & { id?: never };
+type WithId<T> = {[K in keyof T]: T[K]} & { id: number };
+
 type FactoryDefaults<T> = Partial<T> | ((sequence: number) => Partial<T>);
 
-type ReturnType<T> = {
-    data: T;
-    cleanUp: () => Promise<void>;
+type FactoryReturnType<T> = {
+  data: WithId<T>;
+  cleanUp: () => Promise<void>;
 }
 
 /**
@@ -43,9 +45,31 @@ export class Factory<T extends WithoutId> {
   /**
    * Supabase Client
    */
-  getClient(): SupabaseClient  {
+  async getClient(): Promise<SupabaseClient>  {
     if (!this.client) {
-      this.client = supabaseClient()
+      // @ts-ignore it's impossible to make as Context without install the library
+      const client = supabaseClient({
+        // @ts-ignore mocked jwt token
+        req: {
+          // @ts-ignore mocked jwt token
+          header: () => Deno.env.get("SUPABASE_ANON_KEY")!
+        }
+      })
+      const { data, error } = await client.auth.signInWithPassword({
+        email: Deno.env.get("TEST_USER_EMAIL")!,
+        password: Deno.env.get("TEST_USER_PASSWORD")!,
+      })
+      if (error) {
+        throw error
+      }
+      // @ts-ignore it's impossible to make as Context without install the library
+      this.client = supabaseClient({
+        // @ts-ignore mocked jwt token
+        req: {
+          // @ts-ignore mocked jwt token
+          header: () => `Bearer ${data.session!.access_token}`
+        }
+      })
     }
     return this.client!
   }
@@ -77,14 +101,14 @@ export class Factory<T extends WithoutId> {
   /**
    * Calls generate() method and deep merges the result with defaults.
    */
-  async create(override?: FactoryDefaults<T>): Promise<ReturnType<T>> {
+  async create(override?: FactoryDefaults<T>): Promise<FactoryReturnType<T>> {
     this.sequence += 1;
     const dataToInsert = merge(this.generate(), this.getDefaults(), this.getOverride(override));
 
-    const { data, error } = await this.getClient()
+    const { data, error } = await (await this.getClient())
       .from(this.getTableName())
       .insert(dataToInsert)
-      .select<string, T>("*")
+      .select<string, WithId<T>>("*")
       .single();
 
     if (error) {
@@ -94,9 +118,9 @@ export class Factory<T extends WithoutId> {
 
     const cleanUp = async () => {
       if (data) {
-        await this.getClient().from(this.getTableName()).delete().eq("id", data.id);
+        await (await this.getClient()).from(this.getTableName()).delete().eq("id", data.id);
       }
-      await this.client!.auth.stopAutoRefresh()
+      await (await this.getClient()).auth.stopAutoRefresh()
     }
     return { data, cleanUp };
   }
@@ -107,15 +131,15 @@ export class Factory<T extends WithoutId> {
    * @param overrides - Specific fields to override the default data for all records in the batch.
    * @returns An array of the newly created records.
    */
-  async batch(count: number, overrides: Partial<T> = {}): Promise<T[]> {
+  async batch(count: number, overrides: Partial<T> = {}): Promise<WithId<T>[]> {
     const dataToInsert: T[] = Array.from({ length: count }, (_, i) => {
       return merge(this.generate(), this.getDefaults(), this.getOverride(overrides))
     })
 
-    const { data, error } = await this.getClient()
+    const { data, error } = await (await this.getClient())
       .from(this.getTableName())
       .insert(dataToInsert)
-      .select<string, T>();
+      .select<string, WithId<T>>();
 
     if (error) {
       console.error(`Error creating batch of ${count} records:`, error);
