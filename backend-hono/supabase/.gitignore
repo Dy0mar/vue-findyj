@@ -9,3 +9,4 @@
 .env.*.local
 
 deno.lock
+.env.test
