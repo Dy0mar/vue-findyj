@@ -7,14 +7,14 @@ import { findWordsInString } from "./utils/search.ts";
 import { VacancyStatus } from "./constants.ts";
 
 
-export function getClient(context?: Context) {
+export function getClient(context: Context) {
   return createClient<Database>(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_ANON_KEY")!,
     {
       global: {
         headers: {
-          Authorization: context?.req.header('authorization') ?? '',
+          Authorization: context.req.header('authorization') ?? '',
         },
       },
     }
