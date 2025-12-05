@@ -1,20 +1,16 @@
 import type { AxiosResponse } from "axios";
 import type { Ref } from "vue";
 import type { Paginated } from "src/types/models/extra";
-import type {
-  VacancyDetailOut,
-  TitleStopWordIn,
-  DescriptionStopWordIn,
-  VacancyIn,
-} from "src/types/models/vacancy/vacancy";
+import type { VacancyDetailOut, VacancyIn } from "src/types/models/vacancy/vacancy";
 import type { Pages, UseInfiniteQueryOptions, UseMutationOptions } from "src/api/query/types";
 import { vacancyClient } from "src/api/client/vacancy";
 import { queryClient } from "src/queryClient";
 import { DEFAULT_PAGE_SIZE } from "src/constants";
 
-const LIST_QUERY_KEY = "api.vacancies";
+const ROOT_QUERY_KEY = "api.vacancies";
+
 type VacancyListQueryKey = readonly [
-  typeof LIST_QUERY_KEY,
+  typeof ROOT_QUERY_KEY,
   VacancyDetailOut["status"],
   VacancyDetailOut["category"],
   string | undefined,
@@ -33,7 +29,7 @@ class VacancyQuery {
     search: Ref<string | undefined>,
   ) {
     return {
-      queryKey: [LIST_QUERY_KEY, status, category, search],
+      queryKey: [ROOT_QUERY_KEY, status, category, search],
       initialPageParam: 0,
       queryFn: async ({ queryKey, pageParam }) => {
         const [, status, category, search] = queryKey;
@@ -55,12 +51,13 @@ class VacancyQuery {
         return await this.client.patchVacancy({ params: { v_id }, data: rest });
       },
       onMutate: async ({ v_id, status, read }) => {
-        await queryClient.cancelQueries({ queryKey: [LIST_QUERY_KEY], exact: false });
+        await queryClient.cancelQueries({ queryKey: [ROOT_QUERY_KEY], exact: false });
 
+        // fixme: rebuild pages when item has been removed
         // mark read all cached vacancy in caches
         if (read !== undefined) {
           queryClient.setQueriesData<Pages<VacancyDetailOut>>(
-            { queryKey: [LIST_QUERY_KEY], exact: false },
+            { queryKey: [ROOT_QUERY_KEY], exact: false },
             (oldData) => {
               if (!oldData?.pages) {
                 return oldData;
@@ -78,7 +75,7 @@ class VacancyQuery {
           // remove vacancy from all caches
         } else if (status !== undefined) {
           queryClient
-            .getQueriesData<Pages<VacancyDetailOut>>({ queryKey: [LIST_QUERY_KEY], exact: false })
+            .getQueriesData<Pages<VacancyDetailOut>>({ queryKey: [ROOT_QUERY_KEY], exact: false })
             .filter((scope) => (scope[0] as VacancyListQueryKey)[1] !== status)
             .forEach((scope) => {
               const queryKey = scope[0] as VacancyListQueryKey;
@@ -110,28 +107,6 @@ class VacancyQuery {
       { v_id: number; status?: VacancyIn["status"]; read?: VacancyIn["read"] },
       AxiosResponse
     >;
-  }
-
-  /**
-   * Add title stop word.
-   */
-  addTitleStopWord() {
-    return {
-      mutationFn: async (data) => {
-        return (await this.client.addTitleStopWord({ data })).data;
-      },
-    } satisfies UseMutationOptions<TitleStopWordIn>;
-  }
-
-  /**
-   * Add description stop word.
-   */
-  addDescriptionStopWord() {
-    return {
-      mutationFn: async (data) => {
-        return (await this.client.addDescriptionStopWord({ data })).data;
-      },
-    } satisfies UseMutationOptions<DescriptionStopWordIn>;
   }
 }
 

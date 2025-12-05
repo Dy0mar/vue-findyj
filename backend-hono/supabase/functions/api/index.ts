@@ -21,7 +21,7 @@ api.use('*', cors({
       return origin && ALLOWED_ORIGINS.includes(origin) ? origin : ""
     },
     allowHeaders: ['Content-Type', 'Authorization'],
-    allowMethods: ['POST', 'PATCH', 'PUT', 'GET', 'OPTIONS'],
+    allowMethods: ['POST', 'PATCH', 'PUT', 'GET', 'DELETE', 'OPTIONS'],
   })
 )
 
@@ -40,6 +40,7 @@ api.get('/categories', async (c: Context) => {
   const { data } = await getClient(c).from("categories").select<string, Category>()
   return c.json(data ?? [], 200)
 })
+
 
 /** ------------ CRAWLER ------------ */
 
@@ -106,9 +107,42 @@ api.patch('/vacancy/:v_id', async (c: Context) => {
   return c.json(data, 200)
 })
 
+/** ------------ STOP WORDS ------------ */
+
+/** List of description stop words */
+const listStopWords = (typeword: "titlestopword" | "descriptionstopword") => async (c: Context) => {
+  const { data } = await getClient(c).from(typeword).select('*')
+  return c.json(data, 200)
+}
+
+
+/** Add stop word */
+const addStopWord = (typeword: "titlestopword" | "descriptionstopword") => async (c: Context) => {
+  const data = await c.req.json()
+  await getClient(c).from(typeword).upsert(data)
+  return c.json(data, 200)
+}
+
+
+/** Delete stop word */
+const deleteStopWord = (typeword: "titlestopword" | "descriptionstopword") => async (c: Context) => {
+  const id = Number(c.req.param('id'))
+  await getClient(c).from(typeword).delete().eq("id", id)
+  return c.json(undefined, 204)
+}
+
+
+api.get('/stop-words/title', listStopWords("titlestopword"))
+api.post('/stop-words/title', addStopWord("titlestopword"))
+api.delete('/stop-words/title/:id', deleteStopWord("titlestopword"))
+
+api.get('/stop-words/description', listStopWords("descriptionstopword"))
+api.post('/stop-words/description', addStopWord("descriptionstopword"))
+api.delete('/stop-words/description/:id', deleteStopWord("descriptionstopword"))
+
 
 /** Apply title stop word */
-api.get('/vacancy/apply-title-stop-word', async (c: Context) => {
+api.get('/stop-words/title/apply', async (c: Context) => {
   const words = await fetchStopWords(c, "titlestopword")
 
   if (!words.length) {
@@ -133,23 +167,9 @@ api.get('/vacancy/apply-title-stop-word', async (c: Context) => {
   return c.json({ banned }, 200)
 })
 
-/** Add title stop word */
-api.post('/vacancy/title-stop-word', async (c: Context) => {
-  const data = await c.req.json()
-  await getClient(c).from("titlestopword").upsert(data)
-  return c.json(data, 200)
-})
-
-
-/** Add description stop word */
-api.post('/vacancy/description-stop-word', async (c: Context) => {
-  const data = await c.req.json()
-  await getClient(c).from("descriptionstopword").upsert(data)
-  return c.json(data, 200)
-})
 
 /** Apply description stop word */
-api.get('/vacancy/apply-description-stop-word', async (c: Context) => {
+api.get('/stop-words/description/apply', async (c: Context) => {
   const { category } = c.req.query()
 
   const client = getClient(c)

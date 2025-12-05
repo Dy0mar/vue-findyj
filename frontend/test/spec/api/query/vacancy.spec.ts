@@ -1,7 +1,6 @@
 import { http } from "msw";
 import { ref, unref } from "vue";
 import { beforeAll, beforeEach, describe, expect, it } from "vitest";
-
 import type { Pages } from "src/api/query/types";
 import type { VacancyDetailOut } from "src/types/models/vacancy/vacancy";
 import { queryClient } from "src/queryClient";
@@ -28,7 +27,7 @@ describe("vacancyQuery", () => {
 
   beforeAll(() => {
     server.use(
-      http.get(vacancyQuery.client.path.vacanciesList(), () => {
+      http.get(query.client.path.vacanciesList(), () => {
         return HttpResponse.json(vacancies);
       }),
     );
@@ -79,40 +78,12 @@ describe("vacancyQuery", () => {
     });
   });
 
-  describe("addTitleStopWord", () => {
-    beforeAll(() => {
-      server.use(
-        http.post(vacancyQuery.client.path.titleStopWord(), () => {
-          return new HttpResponse(undefined, { status: 201 });
-        }),
-      );
-    });
-
-    it("calls mutationFn should returns empty data", async () => {
-      expect(await query.addTitleStopWord().mutationFn({ word: "foo" })).toBe("");
-    });
-  });
-
-  describe("addDescriptionStopWord", () => {
-    beforeAll(() => {
-      server.use(
-        http.post(vacancyQuery.client.path.descriptionStopWord(), () => {
-          return new HttpResponse(null, { status: 201 });
-        }),
-      );
-    });
-
-    it("calls mutationFn should returns empty data", async () => {
-      expect(await query.addDescriptionStopWord().mutationFn({ word: "foo" })).toBe("");
-    });
-  });
-
   describe("patchVacancy", () => {
     beforeEach(restoreQueryParams);
 
     beforeAll(() => {
       server.use(
-        http.patch(vacancyQuery.client.path.vacancyDetail({ v_id: vacancyId }), async ({ request }) => {
+        http.patch(query.client.path.vacancyDetail({ v_id: vacancyId }), async ({ request }) => {
           const data = await request.json();
           return HttpResponse.json(data);
         }),

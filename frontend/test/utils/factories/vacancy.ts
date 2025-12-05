@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker";
-import type { VacancyDetailOut, VacancyStatusType } from "src/types/models/vacancy/vacancy";
+import type { StopWord, VacancyDetailOut, VacancyStatusType } from "src/types/models/vacancy/vacancy";
 import { Factory } from "test/utils/factories/Factory";
 import { VacancyStatus } from "src/constants";
 
@@ -20,6 +20,15 @@ export class VacancyDetailOutFactory extends Factory<VacancyDetailOut> {
       status_display: faker.helpers.arrayElement(Object.values(VacancyStatus).map((s) => s.toLowerCase())),
       read: faker.datatype.boolean(),
       category: faker.person.jobType(),
+    };
+  }
+}
+
+export class StopWordFactory extends Factory<StopWord> {
+  generate() {
+    return {
+      id: faker.number.int(),
+      word: faker.lorem.word(),
     };
   }
 }

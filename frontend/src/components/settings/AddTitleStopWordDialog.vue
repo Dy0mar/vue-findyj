@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { useMutation } from "@tanstack/vue-query";
 import { useMessage } from "src/hooks/useMessage";
-import { vacancyClient } from "src/api/client/vacancy";
-import { vacancyQuery } from "src/api/query/vacancy";
+import { stopWordsTitleClient } from "src/api/client/stop-words-title";
+import { stopWordsTitleQuery } from "src/api/query/stop-words-title";
 import { useRequest } from "src/hooks/useRequest";
 import { useBus, EventNames } from "src/hooks/useBus";
 import AddDialog from "src/components/settings/AddDialog.vue";
@@ -10,10 +10,10 @@ import AddDialog from "src/components/settings/AddDialog.vue";
 const bus = useBus();
 const { successMessage } = useMessage();
 
-const { requestAsync: applyTitleStopWord } = useRequest(vacancyClient.applyTitleStopWord.bind(vacancyClient));
+const { requestAsync: applyTitleStopWord } = useRequest(stopWordsTitleClient.apply.bind(stopWordsTitleClient));
 
 const visible = defineModel<boolean>("visible", { required: true });
-const { mutateAsync: addTitleStopWord } = useMutation(vacancyQuery.addTitleStopWord());
+const { mutateAsync: addTitleStopWord } = useMutation(stopWordsTitleQuery.create());
 
 async function saveTitle(word: string, apply = false) {
   if (word) {

@@ -5,6 +5,7 @@ import { VueRouterMock, createRouterMock, injectRouterMock } from "vue-router-mo
 
 import { VueQueryPlugin } from "@tanstack/vue-query";
 import { ToastService } from "primevue";
+import ConfirmationService from "primevue/confirmationservice";
 import PrimeVue from "primevue/config";
 
 import { bus } from "src/bus";
@@ -78,7 +79,7 @@ config.global.stubs = {
 config.plugins.VueWrapper.install(VueRouterMock);
 
 // Add global plugins and directives
-config.global.plugins = [[PrimeVue, FTheme], ToastService, [VueQueryPlugin, { queryClient }]];
+config.global.plugins = [[PrimeVue, FTheme], ToastService, ConfirmationService, [VueQueryPlugin, { queryClient }]];
 
 config.global.provide = {
   [EmitterKey as unknown as string]: bus,
