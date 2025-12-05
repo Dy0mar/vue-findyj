@@ -21,7 +21,7 @@ api.use('*', cors({
       return origin && ALLOWED_ORIGINS.includes(origin) ? origin : ""
     },
     allowHeaders: ['Content-Type', 'Authorization'],
-    allowMethods: ['POST', 'PATCH', 'PUT', 'GET', 'OPTIONS'],
+    allowMethods: ['POST', 'PATCH', 'PUT', 'GET', 'DELETE', 'OPTIONS'],
   })
 )
 
