@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { sMounter } from "test/utils/options";
 import { AxiosResponseFactory } from "test/utils/factories/generic";
 import { bus, EventNames } from "src/bus";
-import { vacancyClient } from "src/api/client/vacancy";
+import { stopWordsDescriptionClient } from "src/api/client/stop-words-description";
 import AddDescriptionStopWordDialog from "src/components/settings/AddDescriptionStopWordDialog.vue";
 
 const { successMessage } = vi.hoisted(() => {
@@ -17,9 +17,10 @@ vi.mock("src/hooks/useMessage", () => ({
   useMessage: () => ({ successMessage }),
 }));
 
+const client = stopWordsDescriptionClient;
 const response = new AxiosResponseFactory().create();
-vi.spyOn(vacancyClient, "addDescriptionStopWord").mockResolvedValue(response);
-vi.spyOn(vacancyClient, "applyDescriptionStopWord").mockResolvedValue(response);
+vi.spyOn(client, "create").mockResolvedValue(response);
+vi.spyOn(client, "apply").mockResolvedValue(response);
 
 describe("AddDescriptionStopWordDialog", () => {
   const render = sMounter(AddDescriptionStopWordDialog, { props: { visible: true } });
@@ -28,7 +29,7 @@ describe("AddDescriptionStopWordDialog", () => {
 
   const dialogEmit = async (wrapper: VueWrapper, emitName: "save" | "apply", word: string, withApply?: boolean) => {
     const dialog = wrapper.findComponent({ name: "AddDialog" });
-    await dialog.vm.$emit(emitName, word, withApply);
+    dialog.vm.$emit(emitName, word, withApply);
     await flushPromises();
   };
 
@@ -41,13 +42,13 @@ describe("AddDescriptionStopWordDialog", () => {
     const wrapper = render({ props: { visible: false } });
     expect(wrapper.vm.visible).toBe(false);
     const dialog = wrapper.findComponent({ name: "AddDialog" });
-    await dialog.vm.$emit("update:visible", true);
+    dialog.vm.$emit("update:visible", true);
     expect(wrapper.vm.visible).toBe(true);
   });
 
   describe("action save", () => {
-    it("should call 'add' api function", async () => {
-      const spy = vi.spyOn(vacancyClient, "addDescriptionStopWord").mockResolvedValueOnce(response);
+    it("should call 'create' api function", async () => {
+      const spy = vi.spyOn(client, "create").mockResolvedValueOnce(response);
       const wrapper = render();
       await dialogEmit(wrapper, "save", "foo");
 
@@ -55,7 +56,7 @@ describe("AddDescriptionStopWordDialog", () => {
     });
 
     it("should not call 'apply' api function", async () => {
-      const spy = vi.spyOn(vacancyClient, "applyDescriptionStopWord").mockResolvedValueOnce(response);
+      const spy = vi.spyOn(client, "apply").mockResolvedValueOnce(response);
       const wrapper = render();
       await dialogEmit(wrapper, "save", "foo");
       expect(spy).not.toHaveBeenCalled();
@@ -80,14 +81,14 @@ describe("AddDescriptionStopWordDialog", () => {
 
   describe("action apply", () => {
     it("should call 'apply' api function", async () => {
-      const spy = vi.spyOn(vacancyClient, "applyDescriptionStopWord").mockResolvedValueOnce(response);
+      const spy = vi.spyOn(client, "apply").mockResolvedValueOnce(response);
       const wrapper = render();
       await dialogEmit(wrapper, "apply", "foo", true);
       expect(spy).toHaveBeenCalledExactlyOnceWith();
     });
 
     it("should call 'apply' only for the category", async () => {
-      const spy = vi.spyOn(vacancyClient, "applyDescriptionStopWord").mockResolvedValueOnce(response);
+      const spy = vi.spyOn(client, "apply").mockResolvedValueOnce(response);
       const wrapper = render();
       const router = getRouter();
       await router.setQuery({ category: "bar" });

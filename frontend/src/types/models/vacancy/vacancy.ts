@@ -22,10 +22,10 @@ export type VacancyDetailOut = {
 
 export type VacancyIn = Partial<Omit<VacancyDetailOut, "id">>;
 
-export type TitleStopWordIn = {
-  word: string;
-};
+export type StopWord = { id: number; word: string };
 
-export type DescriptionStopWordIn = {
-  word: string;
-};
+export type TitleStopWord = StopWord;
+export type TitleStopWordIn = Pick<TitleStopWord, "word">;
+
+export type DescriptionStopWord = StopWord;
+export type DescriptionStopWordIn = Pick<DescriptionStopWord, "word">;

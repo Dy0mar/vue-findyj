@@ -1,10 +1,5 @@
 import { BaseAPIClient, BasePath } from "src/api/client/base";
-import type {
-  DescriptionStopWordIn,
-  TitleStopWordIn,
-  VacancyDetailOut,
-  VacancyIn,
-} from "src/types/models/vacancy/vacancy";
+import type { VacancyDetailOut, VacancyIn } from "src/types/models/vacancy/vacancy";
 import type { Paginated } from "src/types/models/extra";
 import type { VacancyListQuery } from "src/types/models/query";
 
@@ -12,7 +7,11 @@ type URLParams = {
   v_id: number;
 };
 
-class Path extends BasePath<URLParams> {
+type IDParams = {
+  id: number;
+};
+
+class Path extends BasePath<URLParams | IDParams> {
   basePath = "/vacancy";
 
   vacanciesList() {
@@ -23,21 +22,29 @@ class Path extends BasePath<URLParams> {
     return this.url({ action: ":v_id/", params });
   }
 
-  titleStopWord() {
-    return this.url({ action: "title-stop-word" });
-  }
+  // titleStopWord() {
+  //   return this.url({ action: "title-stop-word" });
+  // }
 
-  applyTitleStopWord() {
-    return this.url({ action: "apply-title-stop-word" });
-  }
+  // titleStopWordDetail(params: IDParams) {
+  //   return this.url({ action: "title-stop-word/:id", params });
+  // }
 
-  descriptionStopWord() {
-    return this.url({ action: "description-stop-word" });
-  }
-
-  applyDescriptionStopWord() {
-    return this.url({ action: "apply-description-stop-word" });
-  }
+  // applyTitleStopWord() {
+  //   return this.url({ action: "apply-title-stop-word" });
+  // }
+  //
+  // descriptionStopWord() {
+  //   return this.url({ action: "description-stop-word" });
+  // }
+  //
+  // descriptionStopWordDetail(params: IDParams) {
+  //   return this.url({ action: "description-stop-word/:id", params });
+  // }
+  //
+  // applyDescriptionStopWord() {
+  //   return this.url({ action: "apply-description-stop-word" });
+  // }
 }
 
 class VacancyClient extends BaseAPIClient {
@@ -53,25 +60,48 @@ class VacancyClient extends BaseAPIClient {
     return this.client.patch(url, ctx.data);
   }
 
-  addTitleStopWord(ctx: { data: TitleStopWordIn }) {
-    const url = this.path.titleStopWord();
-    return this.client.post(url, ctx.data);
-  }
+  // /** Title stop words */
+  // titleStopWordList() {
+  //   const url = this.path.titleStopWord();
+  //   return this.client.get<TitleStopWord[]>(url);
+  // }
 
-  applyTitleStopWord() {
-    const url = this.path.applyTitleStopWord();
-    return this.client.get(url);
-  }
+  // addTitleStopWord(ctx: { data: TitleStopWordIn }) {
+  //   const url = this.path.titleStopWord();
+  //   return this.client.post(url, ctx.data);
+  // }
 
-  addDescriptionStopWord(ctx: { data: DescriptionStopWordIn }) {
-    const url = this.path.descriptionStopWord();
-    return this.client.post(url, ctx.data);
-  }
+  // removeTitleStopWord(ctx: { params: { id: TitleStopWord["id"] } }) {
+  //   const url = this.path.titleStopWordDetail(ctx.params);
+  //   return this.client.delete(url);
+  // }
 
-  applyDescriptionStopWord(ctx?: { data: { category: string } }) {
-    const url = this.path.applyDescriptionStopWord();
-    return this.client.get(url, { params: ctx?.data });
-  }
+  // applyTitleStopWord() {
+  //   const url = this.path.applyTitleStopWord();
+  //   return this.client.get(url);
+  // }
+
+  /** Description stop words */
+
+  // descriptionStopWordList() {
+  //   const url = this.path.descriptionStopWord();
+  //   return this.client.get<DescriptionStopWord[]>(url);
+  // }
+  //
+  // addDescriptionStopWord(ctx: { data: DescriptionStopWordIn }) {
+  //   const url = this.path.descriptionStopWord();
+  //   return this.client.post(url, ctx.data);
+  // }
+  //
+  // removeDescriptionStopWord(ctx: { params: { id: DescriptionStopWord["id"] } }) {
+  //   const url = this.path.descriptionStopWordDetail(ctx.params);
+  //   return this.client.delete(url);
+  // }
+
+  // applyDescriptionStopWord(ctx?: { data: { category: string } }) {
+  //   const url = this.path.applyDescriptionStopWord();
+  //   return this.client.get(url, { params: ctx?.data });
+  // }
 }
 
 export const vacancyClient = new VacancyClient();

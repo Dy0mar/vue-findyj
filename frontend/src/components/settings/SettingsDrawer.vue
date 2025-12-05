@@ -3,11 +3,14 @@ import { useRoute } from "vue-router";
 import { ref } from "vue";
 import Button from "primevue/button";
 import Drawer from "primevue/drawer";
-import { vacancyClient } from "src/api/client/vacancy";
+import { stopWordsTitleClient } from "src/api/client/stop-words-title";
+import { stopWordsDescriptionClient } from "src/api/client/stop-words-description";
 import { useRequest } from "src/hooks/useRequest";
 import { EventNames, useBus } from "src/hooks/useBus";
 import AddTitleStopWordDialog from "src/components/settings/AddTitleStopWordDialog.vue";
 import AddDescriptionStopWordDialog from "src/components/settings/AddDescriptionStopWordDialog.vue";
+import StopWordTitle from "src/components/settings/StopWordTitle.vue";
+import StopWordDescription from "src/components/settings/StopWordDescription.vue";
 
 const bus = useBus();
 const route = useRoute();
@@ -15,14 +18,17 @@ const visible = defineModel<boolean>("visible", { required: true });
 const isAddTitleStopWordVisible = ref(false);
 const isAddDescriptionStopWordVisible = ref(false);
 
+const isShowTitleList = ref(false);
+const isShowDescriptionList = ref(false);
+
 const afterCb = () => bus.emit(EventNames.REFETCH_VACANCIES);
 const { requestAsync: applyDescriptionStopWord } = useRequest(() => {
   if (route.query.category) {
-    return vacancyClient.applyDescriptionStopWord({ data: { category: String(route.query.category) } });
+    return stopWordsDescriptionClient.apply({ data: { category: String(route.query.category) } });
   }
-  return vacancyClient.applyDescriptionStopWord();
+  return stopWordsDescriptionClient.apply();
 }, afterCb);
-const { requestAsync: applyTitleStopWord } = useRequest(vacancyClient.applyTitleStopWord.bind(vacancyClient), afterCb);
+const { requestAsync: applyTitleStopWord } = useRequest(stopWordsTitleClient.apply.bind(stopWordsTitleClient), afterCb);
 </script>
 
 <template>
@@ -39,6 +45,7 @@ const { requestAsync: applyTitleStopWord } = useRequest(vacancyClient.applyTitle
           <div>Title stop words</div>
           <Button label="Add title stop word" class="flex-auto" outlined @click="isAddTitleStopWordVisible = true" />
           <Button label="Apply title stop word" class="flex-auto" outlined @click="applyTitleStopWord" />
+          <Button label="Show title stop words" class="flex-auto" outlined @click="isShowTitleList = true" />
         </div>
 
         <div class="flex flex-col space-y-4">
@@ -50,10 +57,19 @@ const { requestAsync: applyTitleStopWord } = useRequest(vacancyClient.applyTitle
             @click="isAddDescriptionStopWordVisible = true"
           />
           <Button label="Apply description stop word" class="flex-auto" outlined @click="applyDescriptionStopWord" />
+          <Button
+            label="Show description stop words"
+            class="flex-auto"
+            outlined
+            @click="isShowDescriptionList = true"
+          />
         </div>
       </div>
       <AddTitleStopWordDialog v-model:visible="isAddTitleStopWordVisible" />
       <AddDescriptionStopWordDialog v-model:visible="isAddDescriptionStopWordVisible" />
     </Drawer>
+
+    <StopWordTitle v-model:visible="isShowTitleList" />
+    <StopWordDescription v-model:visible="isShowDescriptionList" />
   </div>
 </template>

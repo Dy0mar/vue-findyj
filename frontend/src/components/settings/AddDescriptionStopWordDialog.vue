@@ -2,9 +2,9 @@
 import { useRoute } from "vue-router";
 import { useMutation } from "@tanstack/vue-query";
 import { useMessage } from "src/hooks/useMessage";
-import { vacancyQuery } from "src/api/query/vacancy";
+import { stopWordsDescriptionQuery } from "src/api/query/stop-words-description";
 import { useRequest } from "src/hooks/useRequest";
-import { vacancyClient } from "src/api/client/vacancy";
+import { stopWordsDescriptionClient } from "src/api/client/stop-words-description";
 import { EventNames, useBus } from "src/hooks/useBus";
 import AddDialog from "src/components/settings/AddDialog.vue";
 
@@ -14,13 +14,13 @@ const { successMessage } = useMessage();
 
 const { requestAsync: applyDescriptionStopWord } = useRequest(() => {
   if (route.query.category) {
-    return vacancyClient.applyDescriptionStopWord({ data: { category: String(route.query.category) } });
+    return stopWordsDescriptionClient.apply({ data: { category: String(route.query.category) } });
   }
-  return vacancyClient.applyDescriptionStopWord();
+  return stopWordsDescriptionClient.apply();
 });
 
 const visible = defineModel<boolean>("visible", { required: true });
-const { mutateAsync } = useMutation(vacancyQuery.addDescriptionStopWord());
+const { mutateAsync } = useMutation(stopWordsDescriptionQuery.create());
 
 async function save(word: string, apply = false) {
   if (word) {

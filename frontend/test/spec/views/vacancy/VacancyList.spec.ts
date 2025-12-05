@@ -45,8 +45,8 @@ describe("VacancyList", () => {
   const options = { props: { status: VacancyStatus.NEW, category: "Python" } };
   const render = aMounter(VacancyList, options, async (wrapper) => {
     if (wrapper) {
-      await wrapper.vm.$nextTick();
       await flushPromises();
+      await wrapper.vm.$nextTick();
     }
   });
   const syncRender = sMounter(VacancyList, options);
@@ -204,7 +204,7 @@ describe("VacancyList", () => {
       const spy = vi.spyOn(vacancyQuery.client, "patchVacancy");
       const wrapper = await render();
       const [card1] = wrapper.findAllComponents({ name: "VacancyCard" });
-      await card1?.vm.$emit("change-status", { v_id: 2, status: VacancyStatus.APPLIED });
+      card1?.vm.$emit("change-status", { v_id: 2, status: VacancyStatus.APPLIED });
       await flushPromises();
       expect(spy).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ data: { status: VacancyStatus.APPLIED } }));
     });
