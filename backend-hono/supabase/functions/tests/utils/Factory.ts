@@ -1,6 +1,7 @@
 import { merge } from "npm:lodash-es";
-import { getClient as supabaseClient } from "../../api/client.ts";
-import { type SupabaseClient } from 'npm:@supabase/supabase-js'
+import type { Database } from "../../api/database.types.ts";
+import { type SupabaseClient, supabase } from "../supabase.ts";
+
 
 type NoId<T> = T & { id?: never };
 type WithoutId = Record<string, unknown> & { id?: never };
@@ -8,9 +9,16 @@ type WithId<T> = {[K in keyof T]: T[K]} & { id: number };
 
 type FactoryDefaults<T> = Partial<T> | ((sequence: number) => Partial<T>);
 
+type TestCallback = (supabase: SupabaseClient) => Promise<void>
+
 type FactoryReturnType<T> = {
   data: WithId<T>;
-  cleanUp: () => Promise<void>;
+  test: (callback: TestCallback) => Promise<void>;
+}
+
+type FactoryReturnArrayType<T> = {
+  data: WithId<T>[];
+  test: (callback: TestCallback) => Promise<void>;
 }
 
 /**
@@ -18,7 +26,7 @@ type FactoryReturnType<T> = {
  * @param T interface or type of the generated data.
  */
 export class Factory<T extends WithoutId> {
-  client?: SupabaseClient;
+  supabase?: SupabaseClient;
   /**
    * Will be merged with every generated object.
    */
@@ -39,39 +47,17 @@ export class Factory<T extends WithoutId> {
   /**
    * A database table name
    */
-  getTableName(): string {
+  getTableName(): keyof Database["public"]["Tables"] {
     throw new Error("Not implemented");
   }
   /**
    * Supabase Client
    */
-  async getClient(): Promise<SupabaseClient>  {
-    if (!this.client) {
-      // @ts-ignore it's impossible to make as Context without install the library
-      const client = supabaseClient({
-        // @ts-ignore mocked jwt token
-        req: {
-          // @ts-ignore mocked jwt token
-          header: () => Deno.env.get("SUPABASE_ANON_KEY")!
-        }
-      })
-      const { data, error } = await client.auth.signInWithPassword({
-        email: Deno.env.get("TEST_USER_EMAIL")!,
-        password: Deno.env.get("TEST_USER_PASSWORD")!,
-      })
-      if (error) {
-        throw error
-      }
-      // @ts-ignore it's impossible to make as Context without install the library
-      this.client = supabaseClient({
-        // @ts-ignore mocked jwt token
-        req: {
-          // @ts-ignore mocked jwt token
-          header: () => `Bearer ${data.session!.access_token}`
-        }
-      })
+  async getSupabase(): Promise<SupabaseClient> {
+    if (!this.supabase) {
+      this.supabase = await supabase()
     }
-    return this.client!
+    return this.supabase!
   }
 
   /**
@@ -105,7 +91,8 @@ export class Factory<T extends WithoutId> {
     this.sequence += 1;
     const dataToInsert = merge(this.generate(), this.getDefaults(), this.getOverride(override));
 
-    const { data, error } = await (await this.getClient())
+    const supabase = await this.getSupabase()
+    const { data, error } = await supabase
       .from(this.getTableName())
       .insert(dataToInsert)
       .select<string, WithId<T>>("*")
@@ -118,11 +105,19 @@ export class Factory<T extends WithoutId> {
 
     const cleanUp = async () => {
       if (data) {
-        await (await this.getClient()).from(this.getTableName()).delete().eq("id", data.id);
+        await supabase.from(this.getTableName()).delete().eq("id", data.id);
       }
-      await (await this.getClient()).auth.stopAutoRefresh()
+      await supabase.auth.signOut()
     }
-    return { data, cleanUp };
+
+    const test = async (callback: (supabase: SupabaseClient) => Promise<void>) => {
+      try {
+        await callback(supabase)
+      } finally {
+        await cleanUp()
+      }
+    }
+    return { data, test };
   }
 
   /**
@@ -131,12 +126,13 @@ export class Factory<T extends WithoutId> {
    * @param overrides - Specific fields to override the default data for all records in the batch.
    * @returns An array of the newly created records.
    */
-  async batch(count: number, overrides: Partial<T> = {}): Promise<WithId<T>[]> {
+  async batch(count: number, overrides: Partial<T> = {}): Promise<FactoryReturnArrayType<T>> {
     const dataToInsert: T[] = Array.from({ length: count }, (_, i) => {
       return merge(this.generate(), this.getDefaults(), this.getOverride(overrides))
     })
 
-    const { data, error } = await (await this.getClient())
+    const supabase = await this.getSupabase()
+    const { data, error } = await supabase
       .from(this.getTableName())
       .insert(dataToInsert)
       .select<string, WithId<T>>();
@@ -146,6 +142,21 @@ export class Factory<T extends WithoutId> {
       throw error;
     }
 
-    return data;
+    const cleanUp = async () => {
+      if (data) {
+        await supabase.from(this.getTableName()).delete().in("id", (data as WithId<T>[]).map(({ id }) => id));
+      }
+      await supabase.auth.signOut()
+    }
+
+    const test = async (callback: (supabase: SupabaseClient) => Promise<void>) => {
+      try {
+        await callback(supabase)
+      } finally {
+        await cleanUp()
+      }
+    }
+
+    return { data, test };
   }
 }

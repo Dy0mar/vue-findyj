@@ -27,6 +27,10 @@ export type Vacancy = {
   salary: string;
 } & ParsedVacancy
 
+export type StopWord = {
+  id: number;
+  word: string;
+}
 
 export type AppVariables = {
   supabase: SupabaseClient<Database, "public">

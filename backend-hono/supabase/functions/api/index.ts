@@ -15,7 +15,7 @@ import { findWordsInString } from "./utils/search.ts";
 import { extractJobDescription } from "./parser.ts";
 import { supabase } from "./middleware.ts";
 
-const api = new Hono<{ Variables: AppVariables }>()
+export const api = new Hono<{ Variables: AppVariables }>()
 
 api.use('*', cors({
     origin: (origin) => {
@@ -38,7 +38,7 @@ api.get('/auth/check', (c) => {
 
 /** List of categories */
 api.get('/categories', async (c) => {
-  const { data } = await getClient(c).from("categories").select<string, Category>()
+  const { data } = await getClient(c).from("categories").select<string, Category>("*")
   return c.json(data ?? [], 200)
 })
 
@@ -246,5 +246,4 @@ api.get('/stop-words/description/apply', async (c) => {
 const app = new Hono()
 app.route('/api', api)
 
-export const myApp = app
 Deno.serve(app.fetch)
