@@ -1,7 +1,7 @@
-import { type Context, Hono } from 'hono'
+import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { HTTPException } from 'hono/http-exception'
-import type { Category, Vacancy } from "./types.ts";
+import type { AppContext, AppVariables, Category, Vacancy } from "./types.ts";
 import { ALLOWED_ORIGINS, VacancyStatus } from "./constants.ts"
 import {
   fetchCategoryByName,
@@ -13,8 +13,9 @@ import { loadVacancies } from "./client.ts";
 import { sleep } from "./utils/time.ts";
 import { findWordsInString } from "./utils/search.ts";
 import { extractJobDescription } from "./parser.ts";
+import { supabase } from "./middleware.ts";
 
-const api = new Hono()
+const api = new Hono<{ Variables: AppVariables }>()
 
 api.use('*', cors({
     origin: (origin) => {
@@ -24,11 +25,11 @@ api.use('*', cors({
     allowMethods: ['POST', 'PATCH', 'PUT', 'GET', 'DELETE', 'OPTIONS'],
   })
 )
-
+api.use('*', supabase())
 
 /** ------------ AUTH ------------ */
 
-api.get('/auth/check', (c: Context) => {
+api.get('/auth/check', (c) => {
   return c.json({ message: "ok" }, 200)
 })
 
@@ -36,7 +37,7 @@ api.get('/auth/check', (c: Context) => {
 /** ------------ CATEGORIES ------------ */
 
 /** List of categories */
-api.get('/categories', async (c: Context) => {
+api.get('/categories', async (c) => {
   const { data } = await getClient(c).from("categories").select<string, Category>()
   return c.json(data ?? [], 200)
 })
@@ -45,7 +46,7 @@ api.get('/categories', async (c: Context) => {
 /** ------------ CRAWLER ------------ */
 
 /** Add vacancies */
-api.get('/crawler/run-parse', async (c: Context) => {
+api.get('/crawler/run-parse', async (c) => {
   const { category } = c.req.query()
 
   const { data: categoryObj } = await fetchCategoryByName(c, category)
@@ -61,7 +62,7 @@ api.get('/crawler/run-parse', async (c: Context) => {
 /** ------------ VACANCY ------------ */
 
 /** List of vacancies */
-api.get('/vacancy', async (c: Context) => {
+api.get('/vacancy', async (c) => {
   const { status, category, offset, limit, search } = c.req.query()
   const pageLimit = parseInt(limit) || 10;
   const pageOffset = parseInt(offset) || 0;
@@ -96,11 +97,12 @@ api.get('/vacancy', async (c: Context) => {
 
 
 /** Update vacancy */
-api.patch('/vacancy/:v_id', async (c: Context) => {
+api.patch('/vacancy/:v_id', async (c) => {
   const v_id = Number(c.req.param('v_id'))
   const data = await c.req.json()
 
-  await getClient(c).from("vacancies")
+  await getClient(c)
+    .from("vacancies")
     .update(data)
     .eq("v_id", v_id)
 
@@ -110,14 +112,14 @@ api.patch('/vacancy/:v_id', async (c: Context) => {
 /** ------------ STOP WORDS ------------ */
 
 /** List of description stop words */
-const listStopWords = (typeword: "titlestopword" | "descriptionstopword") => async (c: Context) => {
+const listStopWords = (typeword: "titlestopword" | "descriptionstopword") => async (c: AppContext) => {
   const { data } = await getClient(c).from(typeword).select('*')
   return c.json(data, 200)
 }
 
 
 /** Add stop word */
-const addStopWord = (typeword: "titlestopword" | "descriptionstopword") => async (c: Context) => {
+const addStopWord = (typeword: "titlestopword" | "descriptionstopword") => async (c: AppContext) => {
   const data = await c.req.json()
   await getClient(c).from(typeword).upsert(data)
   return c.json(data, 200)
@@ -125,10 +127,10 @@ const addStopWord = (typeword: "titlestopword" | "descriptionstopword") => async
 
 
 /** Delete stop word */
-const deleteStopWord = (typeword: "titlestopword" | "descriptionstopword") => async (c: Context) => {
+const deleteStopWord = (typeword: "titlestopword" | "descriptionstopword") => async (c: AppContext) => {
   const id = Number(c.req.param('id'))
   await getClient(c).from(typeword).delete().eq("id", id)
-  return c.json(undefined, 204)
+  return c.body(null, 204)
 }
 
 
@@ -142,7 +144,7 @@ api.delete('/stop-words/description/:id', deleteStopWord("descriptionstopword"))
 
 
 /** Apply title stop word */
-api.get('/stop-words/title/apply', async (c: Context) => {
+api.get('/stop-words/title/apply', async (c) => {
   const words = await fetchStopWords(c, "titlestopword")
 
   if (!words.length) {
@@ -169,7 +171,7 @@ api.get('/stop-words/title/apply', async (c: Context) => {
 
 
 /** Apply description stop word */
-api.get('/stop-words/description/apply', async (c: Context) => {
+api.get('/stop-words/description/apply', async (c) => {
   const { category } = c.req.query()
 
   const client = getClient(c)
@@ -246,4 +248,3 @@ app.route('/api', api)
 
 export const myApp = app
 Deno.serve(app.fetch)
-

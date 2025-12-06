@@ -1,34 +1,20 @@
-import type { Context } from 'hono'
-import { createClient } from '@supabase/supabase-js'
-import type { Category, Vacancy } from "./types.ts";
-import type { Database } from './database.types.ts'
+import type { AppContext, Category, Vacancy } from "./types.ts";
 import { fetchVacancies } from "./parser.ts";
 import { findWordsInString } from "./utils/search.ts";
 import { VacancyStatus } from "./constants.ts";
 
-
-export function getClient(context: Context) {
-  return createClient<Database>(
-    Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_ANON_KEY")!,
-    {
-      global: {
-        headers: {
-          Authorization: context.req.header('authorization') ?? '',
-        },
-      },
-    }
-  )
+export function getClient(c: AppContext) {
+  return c.get('supabase')
 }
 
-export function fetchVacanciesByCategoryId(c: Context, category_id: number, field="*") {
+export function fetchVacanciesByCategoryId(c: AppContext, category_id: number, field="*") {
   return getClient(c)
     .from("vacancies")
     .select<string, Vacancy>(`${field}, categories(name)`, { count: "exact" })
     .eq('category_id', category_id);
 }
 
-export function fetchCategoryByName(c: Context, category: string) {
+export function fetchCategoryByName(c: AppContext, category: string) {
   return getClient(c)
     .from("categories")
     .select<string, Category>("*")
@@ -36,12 +22,14 @@ export function fetchCategoryByName(c: Context, category: string) {
     .single();
 }
 
-export async function fetchStopWords(c: Context, table: "titlestopword" | "descriptionstopword"): Promise<string[]> {
-  const { data: rawWords } = await getClient(c).from(table).select<string, { id: number, word: string }>('word')
+export async function fetchStopWords(c: AppContext, table: "titlestopword" | "descriptionstopword"): Promise<string[]> {
+  const { data: rawWords } = await getClient(c)
+    .from(table)
+    .select<string, { id: number, word: string }>('word')
   return rawWords?.map(({ word }) => word) || [];
 }
 
-export async function loadVacancies(c: Context, category: Category) {
+export async function loadVacancies(c: AppContext, category: Category) {
   const { data: catItems, error: vacError } = await fetchVacanciesByCategoryId(c, category.id, "v_id")
   if (vacError) {
     throw vacError

@@ -1,4 +1,7 @@
+import { Context } from "hono";
 import { VacancyStatus } from "./constants.ts";
+import type { SupabaseClient } from '@supabase/supabase-js'
+import { Database } from "./database.types.ts";
 
 export type Category = {
   id: number;
@@ -23,3 +26,10 @@ export type Vacancy = {
   category_id: Category["id"]
   salary: string;
 } & ParsedVacancy
+
+
+export type AppVariables = {
+  supabase: SupabaseClient<Database, "public">
+};
+
+export type AppContext = Context<{ Variables: AppVariables }>
