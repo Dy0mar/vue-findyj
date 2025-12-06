@@ -23,7 +23,7 @@ vi.mock("src/hooks/useMessage", () => ({
 
 const responseMock = (response: JsonBodyType) => {
   server.use(
-    http.get(vacancyQuery.client.path.vacanciesList(), () => {
+    http.get(vacancyQuery.client.path.list(), () => {
       return HttpResponse.json(response);
     }),
   );
@@ -138,11 +138,11 @@ describe("VacancyList", () => {
   describe("card", () => {
     beforeAll(() => {
       server.use(
-        http.patch(vacancyQuery.client.path.vacancyDetail({ v_id: 1 }), async ({ request }) => {
+        http.patch(vacancyQuery.client.path.detail({ v_id: 1 }), async ({ request }) => {
           const data = await request.json();
           return HttpResponse.json(data);
         }),
-        http.patch(vacancyQuery.client.path.vacancyDetail({ v_id: 2 }), async ({ request }) => {
+        http.patch(vacancyQuery.client.path.detail({ v_id: 2 }), async ({ request }) => {
           const data = await request.json();
           return HttpResponse.json(data);
         }),

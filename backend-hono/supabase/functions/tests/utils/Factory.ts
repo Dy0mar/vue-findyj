@@ -107,7 +107,6 @@ export class Factory<T extends WithoutId> {
       if (data) {
         await supabase.from(this.getTableName()).delete().eq("id", data.id);
       }
-      await supabase.auth.signOut()
     }
 
     const test = async (callback: (supabase: SupabaseClient) => Promise<void>) => {

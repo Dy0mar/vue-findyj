@@ -62,7 +62,7 @@ api.get('/crawler/run-parse', async (c) => {
 /** ------------ VACANCY ------------ */
 
 /** List of vacancies */
-api.get('/vacancy', async (c) => {
+api.get('/vacancies', async (c) => {
   const { status, category, offset, limit, search } = c.req.query()
   const pageLimit = parseInt(limit) || 10;
   const pageOffset = parseInt(offset) || 0;
@@ -97,7 +97,7 @@ api.get('/vacancy', async (c) => {
 
 
 /** Update vacancy */
-api.patch('/vacancy/:v_id', async (c) => {
+api.patch('/vacancies/:v_id', async (c) => {
   const v_id = Number(c.req.param('v_id'))
   const data = await c.req.json()
 
