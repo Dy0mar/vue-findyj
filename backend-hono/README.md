@@ -29,3 +29,11 @@ To execute the test suite, run the following command:
 ```bash
 deno test --config ./path-to/deno.json --env-file=./path-to/.env.test --allow-all ./path-to/tests/ --trace-leaks
 ```
+
+## Deployment
+
+To deploy the function, run the following command:
+
+```bash
+npx supabase functions deploy api
+```

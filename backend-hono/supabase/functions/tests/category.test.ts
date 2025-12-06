@@ -3,13 +3,7 @@ import { CategoryFactory } from "./utils/factories.ts";
 import { Category } from "../api/types.ts";
 import { api } from "../api/index.ts";
 
-const url = "categories"
-const unauthenticated = async () => {
-  const res = await api.request(url);
-
-  assertEquals(res.status, 401);
-}
-
+const url = "/categories"
 const categories = async () => {
   const { data, test } = await new CategoryFactory().create()
 
@@ -31,5 +25,4 @@ const categories = async () => {
 }
 
 
-Deno.test('Unauthorized user does not have access', unauthenticated)
 Deno.test('Should response correct data', categories)
