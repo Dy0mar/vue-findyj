@@ -2,7 +2,7 @@ import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { HTTPException } from 'hono/http-exception'
 import type { AppContext, AppVariables, Category, Vacancy } from "./types.ts";
-import { ALLOWED_ORIGINS, VacancyStatus } from "./constants.ts"
+import { ALLOWED_ORIGINS, VacancyStatus, ALLOWED_METHODS } from "./constants.ts"
 import {
   fetchCategoryByName,
   fetchStopWords,
@@ -22,7 +22,7 @@ api.use('*', cors({
       return origin && ALLOWED_ORIGINS.includes(origin) ? origin : ""
     },
     allowHeaders: ['Content-Type', 'Authorization'],
-    allowMethods: ['POST', 'PATCH', 'PUT', 'GET', 'DELETE', 'OPTIONS'],
+    allowMethods: ALLOWED_METHODS,
   })
 )
 api.use('*', supabase())
@@ -246,4 +246,6 @@ api.get('/stop-words/description/apply', async (c) => {
 const app = new Hono()
 app.route('/api', api)
 
+export const myApp = app
+export type MyAppType = typeof myApp;
 Deno.serve(app.fetch)

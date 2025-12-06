@@ -1,7 +1,7 @@
 import { Context } from "hono";
-import { VacancyStatus } from "./constants.ts";
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { Database } from "./database.types.ts";
+import type { Database } from "./database.types.ts";
+import { VacancyStatus } from "./constants.ts";
 
 export type Category = {
   id: number;
