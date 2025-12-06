@@ -1,4 +1,4 @@
-import { merge } from "npm:lodash-es";
+import { merge } from "lodash-es";
 import type { Database } from "../../api/database.types.ts";
 import { type SupabaseClient, supabase } from "../supabase.ts";
 
@@ -126,7 +126,7 @@ export class Factory<T extends WithoutId> {
    * @returns An array of the newly created records.
    */
   async batch(count: number, overrides: Partial<T> = {}): Promise<FactoryReturnArrayType<T>> {
-    const dataToInsert: T[] = Array.from({ length: count }, (_, i) => {
+    const dataToInsert: T[] = Array.from({ length: count }, () => {
       return merge(this.generate(), this.getDefaults(), this.getOverride(overrides))
     })
 

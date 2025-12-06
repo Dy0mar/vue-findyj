@@ -1,4 +1,4 @@
-import { faker } from "jsr:@jackfiszr/faker@1.1.6";
+import { faker } from "@jackfiszr/faker@1.1.6";
 import { Category, StopWord } from "../../api/types.ts";
 import { Factory } from "./Factory.ts";
 

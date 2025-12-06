@@ -1,4 +1,4 @@
-import { assert, assertEquals } from 'jsr:@std/assert@1'
+import { assert, assertEquals } from '@std/assert'
 import { CategoryFactory } from "./utils/factories.ts";
 import { Category } from "../api/types.ts";
 import { request } from "./supabase.ts";

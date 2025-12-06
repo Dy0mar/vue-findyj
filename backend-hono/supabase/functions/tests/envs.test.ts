@@ -1,4 +1,4 @@
-import { assert } from 'jsr:@std/assert@1'
+import { assert } from '@std/assert'
 
 const testEnvs = () => {
   for(const key of ["SITE_URL", "SUPABASE_URL", "SUPABASE_ANON_KEY", "ALLOWED_ORIGINS"]) {
