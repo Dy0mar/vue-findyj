@@ -6,7 +6,7 @@ import { HTTPMethod } from "../api/constants.ts";
 
 export type SupabaseClient = ReturnType<typeof getClient>
 
-export function createSupabase(): SupabaseClient {
+function createSupabaseClient(): SupabaseClient {
   return createClient<Database, "public">(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_ANON_KEY")!,
@@ -20,7 +20,7 @@ export function createSupabase(): SupabaseClient {
 }
 
 export async function supabase() {
-  const supabase = createSupabase()
+  const supabase = createSupabaseClient()
   const { error } = await supabase.auth.signInWithPassword({
     email: Deno.env.get("TEST_USER_EMAIL")!,
     password: Deno.env.get("TEST_USER_PASSWORD")!,

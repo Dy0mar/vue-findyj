@@ -2,7 +2,7 @@
  * Find word in string
  */
 function findWord(word: string, str: string): boolean {
-  return str.includes(word.toLowerCase())
+  return str.toLowerCase().includes(word.toLowerCase())
 }
 
 /**

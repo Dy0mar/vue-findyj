@@ -1,5 +1,5 @@
 import { assert, assertEquals } from '@std/assert'
-import { CategoryFactory } from "./utils/factories.ts";
+import { CategoryFactory } from "./test-utils/factories.ts";
 import { Category } from "../api/types.ts";
 import { request } from "./supabase.ts";
 
