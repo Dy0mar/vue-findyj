@@ -4,7 +4,7 @@ import { BaseAPIClient, BasePath } from "src/api/client/base";
 class Path extends BasePath {
   basePath = "/categories";
 
-  categoryList() {
+  list() {
     return this.url({ action: "" });
   }
 }
@@ -13,7 +13,7 @@ class CategoryClient extends BaseAPIClient {
   path = new Path();
 
   categoryList() {
-    const url = this.path.categoryList();
+    const url = this.path.list();
     return this.client.get<Category[]>(url);
   }
 }

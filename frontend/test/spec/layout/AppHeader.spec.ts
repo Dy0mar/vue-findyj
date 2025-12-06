@@ -27,7 +27,7 @@ describe("AppHeader", () => {
 
   beforeAll(() => {
     server.use(
-      http.get(categoryClient.path.categoryList(), () => {
+      http.get(categoryClient.path.list(), () => {
         return HttpResponse.json(categories);
       }),
     );
