@@ -27,13 +27,13 @@ describe("vacancyQuery", () => {
 
   beforeAll(() => {
     server.use(
-      http.get(query.client.path.vacanciesList(), () => {
+      http.get(query.client.path.list(), () => {
         return HttpResponse.json(vacancies);
       }),
     );
   });
 
-  describe("vacanciesList", () => {
+  describe("vacancies", () => {
     beforeEach(restoreQueryParams);
 
     it("should have an initialPageParam", () => {
@@ -83,7 +83,7 @@ describe("vacancyQuery", () => {
 
     beforeAll(() => {
       server.use(
-        http.patch(query.client.path.vacancyDetail({ v_id: vacancyId }), async ({ request }) => {
+        http.patch(query.client.path.detail({ v_id: vacancyId }), async ({ request }) => {
           const data = await request.json();
           return HttpResponse.json(data);
         }),

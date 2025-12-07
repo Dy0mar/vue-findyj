@@ -11,7 +11,7 @@ describe("categoryQuery", () => {
 
   beforeAll(() => {
     server.use(
-      http.get(categoryQuery.client.path.categoryList(), () => {
+      http.get(categoryQuery.client.path.list(), () => {
         return HttpResponse.json(data);
       }),
     );

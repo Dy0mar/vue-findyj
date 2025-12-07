@@ -15,10 +15,10 @@ describe("vacancyClient", () => {
 
   beforeAll(() => {
     server.use(
-      http.get(vacancyClient.path.vacanciesList(), () => {
+      http.get(vacancyClient.path.list(), () => {
         return HttpResponse.json(vacancies);
       }),
-      http.patch(vacancyClient.path.vacancyDetail({ v_id }), async ({ request }) => {
+      http.patch(vacancyClient.path.detail({ v_id }), async ({ request }) => {
         const data = await request.json();
         return HttpResponse.json(data);
       }),
