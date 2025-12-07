@@ -11,12 +11,14 @@ type FactoryDefaults<T> = Partial<T> | ((sequence: number) => Partial<T>);
 
 type TestCallback = (supabase: SupabaseClient) => Promise<void>
 
-type FactoryReturnType<T> = {
-  data: WithId<T>;
+type FactoryBuild<T> = {
+  data: T;
   test: (callback: TestCallback) => Promise<void>;
 }
 
-type FactoryReturnArrayType<T> = {
+type FactoryCreate<T> = FactoryBuild<WithId<T>>
+
+type FactoryBatch<T> = {
   data: WithId<T>[];
   test: (callback: TestCallback) => Promise<void>;
 }
@@ -84,12 +86,25 @@ export class Factory<T extends WithoutId> {
     return this.getOverride(this.defaults);
   }
 
+  async cleanUp() {
+    // hack to avoid "DELETE requires a WHERE clause"
+    await (await this.getSupabase()).from(this.getTableName()).delete().neq("id", -1)
+  }
+
+  test = (client: SupabaseClient) => async (callback: TestCallback) => {
+    try {
+      await callback(client)
+    } finally {
+      await this.cleanUp()
+    }
+  }
+
   /**
-   * Calls generate() method and deep merges the result with defaults.
+   * Creates a single record in the database.
    */
-  async create(override?: FactoryDefaults<T>): Promise<FactoryReturnType<T>> {
+  async create(override?: FactoryDefaults<T>): Promise<FactoryCreate<T>> {
     this.sequence += 1;
-    const dataToInsert = merge(this.generate(), this.getDefaults(), this.getOverride(override));
+    const dataToInsert: T = merge(this.generate(), this.getDefaults(), this.getOverride(override));
 
     const supabase = await this.getSupabase()
     const { data, error } = await supabase
@@ -103,20 +118,7 @@ export class Factory<T extends WithoutId> {
       throw error;
     }
 
-    const cleanUp = async () => {
-      if (data) {
-        await supabase.from(this.getTableName()).delete().eq("id", data.id);
-      }
-    }
-
-    const test = async (callback: (supabase: SupabaseClient) => Promise<void>) => {
-      try {
-        await callback(supabase)
-      } finally {
-        await cleanUp()
-      }
-    }
-    return { data, test };
+    return { data, test: this.test(supabase) };
   }
 
   /**
@@ -125,7 +127,7 @@ export class Factory<T extends WithoutId> {
    * @param overrides - Specific fields to override the default data for all records in the batch.
    * @returns An array of the newly created records.
    */
-  async batch(count: number, overrides: Partial<T> = {}): Promise<FactoryReturnArrayType<T>> {
+  async batch(count: number, overrides: Partial<T> = {}): Promise<FactoryBatch<T>> {
     const dataToInsert: T[] = Array.from({ length: count }, () => {
       return merge(this.generate(), this.getDefaults(), this.getOverride(overrides))
     })
@@ -141,21 +143,31 @@ export class Factory<T extends WithoutId> {
       throw error;
     }
 
-    const cleanUp = async () => {
-      if (data) {
-        await supabase.from(this.getTableName()).delete().in("id", (data as WithId<T>[]).map(({ id }) => id));
-      }
-      await supabase.auth.signOut()
-    }
+    return { data, test: this.test(supabase) };
+  }
 
-    const test = async (callback: (supabase: SupabaseClient) => Promise<void>) => {
-      try {
-        await callback(supabase)
-      } finally {
-        await cleanUp()
-      }
-    }
+  /**
+   * Creates a single record without saving to the database.
+   */
+  async build(override?: FactoryDefaults<T>): Promise<FactoryBuild<T>> {
+    this.sequence += 1;
+    const supabase = await this.getSupabase()
+    return {
+      data: merge(this.generate(), this.getDefaults(), this.getOverride(override)),
+      test: this.test(supabase)
+    };
+  }
 
-    return { data, test };
+  /**
+   * Builds a batch of records without saving them to the database.
+   * @param count - The number of records to build.
+   * @param overrides - Specific fields to override the default data for all records in the batch.
+   * @returns An array of the built records.
+   */
+  buildBatch(count: number, overrides: Partial<T> = {}): NoId<T>[] {
+    return Array.from({ length: count }, () => {
+      this.sequence += 1;
+      return merge(this.generate(), this.getDefaults(), this.getOverride(overrides))
+    });
   }
 }

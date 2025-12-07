@@ -1,5 +1,5 @@
 import type { AppContext, Category, Vacancy } from "./types.ts";
-import type { ProductionTables, TableNames } from "./database.types.ts";
+import type { ProductionTables } from "./database.types.ts";
 import { fetchVacancies } from "./parser.ts";
 import { findWordsInString } from "./utils/search.ts";
 import { VacancyStatus } from "./constants.ts";
@@ -8,9 +8,13 @@ export function getClient(c: AppContext) {
   return c.get('supabase')
 }
 
-export const Table = new Proxy({} as Record<ProductionTables, TableNames>, {
+type TableNameMap = {
+  [K in ProductionTables]: K
+};
+
+export const Table = new Proxy({} as TableNameMap, {
   get: (_target, prop: string) => {
-    return Deno.env.get("TEST_MODE") ? `test_${prop}` : prop;
+    return Deno.env.get("TEST_MODE") ? `test_${prop}` as const : prop
   },
 });
 

@@ -34,21 +34,26 @@ export async function supabase() {
 
 
 export async function request(url: string, method: HTTPMethod, requestInit: RequestInit & { auth?: boolean } = {}) {
-   let { auth, ...rest} = requestInit
+  const { auth, ...rest } = requestInit;
+
+  const headers = new Headers(rest.headers);
+  if (!headers.has('Content-Type')) {
+    headers.set('Content-Type', 'application/json;charset=UTF-8');
+  }
 
   if (auth !== false) {
-    const { data: { session } } = await (await supabase()).auth.getSession()
-    rest = {
-      headers: {
-        Authorization: `Bearer ${session!.access_token}`,
-        ...rest?.headers
-      }
+    const { data: { session } } = await (await supabase()).auth.getSession();
+    if (session) {
+      headers.set('Authorization', `Bearer ${session.access_token}`);
     }
   }
 
-  return await api.request(url, {
+  return await api.request(
+    url,
+    {
       method,
-      ...rest
+      ...rest,
+      headers,
     } satisfies RequestInit
   );
 }

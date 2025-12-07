@@ -5,7 +5,7 @@ import { request } from "./supabase.ts";
 
 const url = "/categories"
 
-Deno.test('categories', async (t) => {
+Deno.test('Categories - list', async (t) => {
   await t.step("Should return empty list", async () => {
     const res = await request(url, 'GET')
     assertEquals(res.status, 200);

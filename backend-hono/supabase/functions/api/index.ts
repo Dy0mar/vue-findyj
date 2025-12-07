@@ -123,7 +123,7 @@ const listStopWords = (table: "titlestopword" | "descriptionstopword") => async 
 const addStopWord = (table: "titlestopword" | "descriptionstopword") => async (c: AppContext) => {
   const data = await c.req.json()
   await getClient(c).from(Table[table]).upsert(data)
-  return c.json(data, 200)
+  return c.json(data, 201)
 }
 
 
@@ -186,7 +186,7 @@ api.get('/stop-words/description/apply', async (c) => {
     }
     query = fetchVacanciesByCategoryId(c, categoryObj.id)
   } else {
-    query = client.from(Table.vacancies as "vacancies" | "test_vacancies").select("*")
+    query = client.from(Table.vacancies).select("*")
   }
 
   query = query.neq("status", VacancyStatus.BANNED)
@@ -247,6 +247,4 @@ api.get('/stop-words/description/apply', async (c) => {
 const app = new Hono()
 app.route('/api', api)
 
-export const myApp = app
-export type MyAppType = typeof myApp;
 Deno.serve(app.fetch)
