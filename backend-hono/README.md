@@ -30,6 +30,12 @@ To execute the test suite, run the following command:
 deno test --config ./path-to/deno.json --env-file=./path-to/.env.test --allow-all ./path-to/tests/ --trace-leaks
 ```
 
+coverage
+
+```bash
+deno test --config ./path-to/deno.json --env-file=./path-to/.env.test --allow-all ./path-to/tests/ --trace-leaks --coverage=coverage
+```
+
 ## Deployment
 
 To deploy the function, run the following command:
