@@ -6,13 +6,12 @@ import { request } from "./supabase.ts";
 const url = "/categories"
 
 Deno.test('categories', async (t) => {
-  // todo: fix select when tests
-  // await t.step("Should return empty list", async () => {
-  //   const res = await request(url, 'GET')
-  //   assertEquals(res.status, 200);
-  //   const json: Category[] = await res.json();
-  //   assertEquals(json, []);
-  // })
+  await t.step("Should return empty list", async () => {
+    const res = await request(url, 'GET')
+    assertEquals(res.status, 200);
+    const json: Category[] = await res.json();
+    assertEquals(json, []);
+  })
 
   await t.step("Should return generated data", async () => {
     const { data, test } = await new CategoryFactory().create()

@@ -1,5 +1,5 @@
 import { merge } from "lodash-es";
-import type { Database } from "../../api/database.types.ts";
+import type { TestTables } from "../../api/database.types.ts";
 import { type SupabaseClient, supabase } from "../supabase.ts";
 
 
@@ -47,7 +47,7 @@ export class Factory<T extends WithoutId> {
   /**
    * A database table name
    */
-  getTableName(): keyof Database["public"]["Tables"] {
+  getTableName(): TestTables {
     throw new Error("Not implemented");
   }
   /**

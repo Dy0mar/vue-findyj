@@ -30,10 +30,16 @@ To execute the test suite, run the following command:
 deno test --config ./path-to/deno.json --env-file=./path-to/.env.test --allow-all ./path-to/tests/ --trace-leaks
 ```
 
-coverage
+### 4. Running the Tests with coverage
 
 ```bash
 deno test --config ./path-to/deno.json --env-file=./path-to/.env.test --allow-all ./path-to/tests/ --trace-leaks --coverage=coverage
+```
+
+### 5. Lint
+
+```bash
+deno lint --config ./api/deno.json
 ```
 
 ## Deployment
