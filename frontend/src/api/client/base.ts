@@ -48,6 +48,17 @@ axiosClient.interceptors.request.use(async (config) => {
   return config;
 });
 
+axiosClient.interceptors.response.use(
+  async (response) => response,
+  async (error) => {
+    const authPage = "/auth";
+    if (error.response?.status === 401 && window.location.pathname.indexOf(authPage) === -1) {
+      await supabase.auth.signOut();
+    }
+    return Promise.reject(error);
+  },
+);
+
 export abstract class BaseAPIClient<URL_TEMPLATE_PARAMS extends URLTemplateParams = never> {
   /**
    * The base path for the service. Can be simple `/` or nested, for example `/parent/:parentId/child/`.

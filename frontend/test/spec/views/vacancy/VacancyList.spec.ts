@@ -66,7 +66,7 @@ describe("VacancyList", () => {
 
   it("should show loading text", async () => {
     const wrapper = syncRender();
-    expect(wrapper.text()).toContain("Loading...");
+    expect(wrapper.find("i.pi-spin").exists()).toBe(true);
   });
 
   it("api client should be called on mounted", async () => {

@@ -8,8 +8,8 @@ describe("AuthView", () => {
     expect(wrapper.exists()).toBe(true);
   });
 
-  it("should has form", () => {
+  it("should has RouterView", () => {
     const wrapper = mount(AuthView);
-    expect(wrapper.findComponent({ name: "LoginView" }).exists()).toBe(true);
+    expect(wrapper.findComponent({ name: "RouterView" }).exists()).toBe(true);
   });
 });

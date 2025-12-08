@@ -98,6 +98,9 @@ watch(selected, (value) => {
       class="bg-surface-200/30 border-surface-600 hover:border-pink-400 text-primary-900"
       @click="() => fetchNextPage()"
     />
-    <div v-if="isFetching" class="text-center">Loading...</div>
+
+    <div class="flex justify-center">
+      <i v-if="isFetching" class="pi pi-spin pi-spinner text-3xl text-center text-pink-500"></i>
+    </div>
   </div>
 </template>

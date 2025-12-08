@@ -1,30 +1,30 @@
-import { shallowMount } from "@vue/test-utils";
+import { flushPromises } from "@vue/test-utils";
 import { describe, expect, it } from "vitest";
+import { sMounter } from "test/utils/options";
+import { bus, EventNames } from "src/bus";
 import AppLayout from "src/layout/AppLayout.vue";
 
 describe("AppLayout", () => {
+  const render = sMounter(AppLayout, { shallow: true });
+
   it("should mount successfully", () => {
-    const wrapper = shallowMount(AppLayout);
+    const wrapper = render();
     expect(wrapper.exists()).toBe(true);
   });
 
-  it("should render default slot content", () => {
-    const slotContent = '<div class="test-content">Test Content</div>';
-    const wrapper = shallowMount(AppLayout, {
-      slots: {
-        default: slotContent,
-      },
-    });
-    expect(wrapper.html()).toContain(slotContent);
+  it("settings should change local visible", async () => {
+    const wrapper = render();
+    await flushPromises();
+    wrapper.findComponent({ name: "SettingsDrawer" }).vm.$emit("update:visible", true);
+    // @ts-expect-error private property
+    expect(wrapper.vm.visible).toBe(true);
   });
 
-  it("should render slot content in main section", () => {
-    const slotContent = '<div class="test-content">Test Content</div>';
-    const wrapper = shallowMount(AppLayout, {
-      slots: {
-        default: slotContent,
-      },
-    });
-    expect(wrapper.find("main").html()).toContain(slotContent);
+  it("bus event should close the settings", async () => {
+    const wrapper = render();
+    await flushPromises();
+    bus.emit(EventNames.OPEN_SETTINGS);
+    await wrapper.vm.$nextTick();
+    expect(wrapper.findComponent({ name: "SettingsDrawer" }).props("visible")).toBe(true);
   });
 });

@@ -1,6 +1,6 @@
 import type { RouteRecordRaw } from "vue-router";
 import { describe, expect, it } from "vitest";
-import { router } from "src/router";
+import router from "src/router";
 
 describe("routes", () => {
   const { routes } = router.options;
