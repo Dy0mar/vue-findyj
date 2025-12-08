@@ -7,10 +7,30 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
-  __InternalSupabase: {
-    PostgrestVersion: "12.2.3 (519615d)"
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
   }
   public: {
     Tables: {
@@ -20,11 +40,11 @@ export type Database = {
           name: string
         }
         Insert: {
-          id?: number
+          id?: never
           name?: string
         }
         Update: {
-          id?: number
+          id?: never
           name?: string
         }
         Relationships: []
@@ -43,6 +63,107 @@ export type Database = {
           word?: string
         }
         Relationships: []
+      }
+      test_categories: {
+        Row: {
+          id: number
+          name: string
+        }
+        Insert: {
+          id?: never
+          name?: string
+        }
+        Update: {
+          id?: never
+          name?: string
+        }
+        Relationships: []
+      }
+      test_descriptionstopword: {
+        Row: {
+          id: number
+          word: string
+        }
+        Insert: {
+          id?: number
+          word: string
+        }
+        Update: {
+          id?: number
+          word?: string
+        }
+        Relationships: []
+      }
+      test_titlestopword: {
+        Row: {
+          id: number
+          word: string
+        }
+        Insert: {
+          id?: number
+          word: string
+        }
+        Update: {
+          id?: number
+          word?: string
+        }
+        Relationships: []
+      }
+      test_vacancies: {
+        Row: {
+          category_id: number | null
+          cities: string | null
+          company: string | null
+          created_at: string
+          date: string | null
+          description: string | null
+          id: number
+          link: string | null
+          read: boolean
+          salary: string | null
+          status: string
+          title: string | null
+          v_id: number
+        }
+        Insert: {
+          category_id?: number | null
+          cities?: string | null
+          company?: string | null
+          created_at?: string
+          date?: string | null
+          description?: string | null
+          id?: number
+          link?: string | null
+          read?: boolean
+          salary?: string | null
+          status?: string
+          title?: string | null
+          v_id: number
+        }
+        Update: {
+          category_id?: number | null
+          cities?: string | null
+          company?: string | null
+          created_at?: string
+          date?: string | null
+          description?: string | null
+          id?: number
+          link?: string | null
+          read?: boolean
+          salary?: string | null
+          status?: string
+          title?: string | null
+          v_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "test_vacancies_category_id_fkey1"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "test_categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       titlestopword: {
         Row: {
@@ -249,7 +370,15 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {},
   },
 } as const
+
+
+export type TableNames = keyof Database["public"]["Tables"]
+export type ProductionTables = Exclude<TableNames, `test_${string}`>
+export type TestTables = Extract<TableNames, `test_${string}`>

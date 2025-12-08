@@ -1,4 +1,5 @@
 import type { AppContext, Category, Vacancy } from "./types.ts";
+import type { ProductionTables } from "./database.types.ts";
 import { fetchVacancies } from "./parser.ts";
 import { findWordsInString } from "./utils/search.ts";
 import { VacancyStatus } from "./constants.ts";
@@ -7,16 +8,26 @@ export function getClient(c: AppContext) {
   return c.get('supabase')
 }
 
+type TableNameMap = {
+  [K in ProductionTables]: K
+};
+
+export const Table = new Proxy({} as TableNameMap, {
+  get: (_target, prop: string) => {
+    return Deno.env.get("TEST_MODE") ? `test_${prop}` as const : prop
+  },
+});
+
 export function fetchVacanciesByCategoryId(c: AppContext, category_id: number, field="*") {
   return getClient(c)
-    .from("vacancies")
+    .from(Table.vacancies)
     .select<string, Vacancy>(`${field}, categories(name)`, { count: "exact" })
     .eq('category_id', category_id);
 }
 
 export function fetchCategoryByName(c: AppContext, category: string) {
   return getClient(c)
-    .from("categories")
+    .from(Table.categories)
     .select<string, Category>("*")
     .eq("name", category)
     .single();
@@ -24,7 +35,7 @@ export function fetchCategoryByName(c: AppContext, category: string) {
 
 export async function fetchStopWords(c: AppContext, table: "titlestopword" | "descriptionstopword"): Promise<string[]> {
   const { data: rawWords } = await getClient(c)
-    .from(table)
+    .from(Table[table])
     .select<string, { id: number, word: string }>('word')
   return rawWords?.map(({ word }) => word) || [];
 }
@@ -56,7 +67,7 @@ export async function loadVacancies(c: AppContext, category: Category) {
     })
 
   const { error } = await client
-    .from("vacancies")
+    .from(Table.vacancies)
     .insert(vacancies_to_create);
 
   if (error) {
@@ -68,7 +79,7 @@ export async function loadVacancies(c: AppContext, category: Category) {
 
   if (ids_to_remove.length > 0) {
     const { error } = await client
-      .from('vacancies')
+      .from(Table.vacancies)
       .delete()
       .in("v_id", ids_to_remove)
 

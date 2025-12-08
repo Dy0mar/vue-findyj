@@ -7,7 +7,8 @@ import {
   fetchCategoryByName,
   fetchStopWords,
   fetchVacanciesByCategoryId,
-  getClient
+  getClient,
+  Table
 } from "./client.ts";
 import { loadVacancies } from "./client.ts";
 import { sleep } from "./utils/time.ts";
@@ -38,7 +39,7 @@ api.get('/auth/check', (c) => {
 
 /** List of categories */
 api.get('/categories', async (c) => {
-  const { data } = await getClient(c).from("categories").select<string, Category>("*")
+  const { data } = await getClient(c).from(Table.categories).select<string, Category>("*")
   return c.json(data ?? [], 200)
 })
 
@@ -77,7 +78,7 @@ api.get('/vacancies', async (c) => {
     }
     query = fetchVacanciesByCategoryId(c, categoryObj.id)
   } else {
-    query = client.from("vacancies").select("*", { count: "exact" })
+    query = client.from(Table.vacancies).select("*", { count: "exact" })
   }
 
   if (status) {
@@ -102,7 +103,7 @@ api.patch('/vacancies/:v_id', async (c) => {
   const data = await c.req.json()
 
   await getClient(c)
-    .from("vacancies")
+    .from(Table.vacancies)
     .update(data)
     .eq("v_id", v_id)
 
@@ -112,24 +113,24 @@ api.patch('/vacancies/:v_id', async (c) => {
 /** ------------ STOP WORDS ------------ */
 
 /** List of description stop words */
-const listStopWords = (typeword: "titlestopword" | "descriptionstopword") => async (c: AppContext) => {
-  const { data } = await getClient(c).from(typeword).select('*')
+const listStopWords = (table: "titlestopword" | "descriptionstopword") => async (c: AppContext) => {
+  const { data } = await getClient(c).from(Table[table]).select('*')
   return c.json(data, 200)
 }
 
 
 /** Add stop word */
-const addStopWord = (typeword: "titlestopword" | "descriptionstopword") => async (c: AppContext) => {
+const addStopWord = (table: "titlestopword" | "descriptionstopword") => async (c: AppContext) => {
   const data = await c.req.json()
-  await getClient(c).from(typeword).upsert(data)
-  return c.json(data, 200)
+  await getClient(c).from(Table[table]).upsert(data)
+  return c.json(data, 201)
 }
 
 
 /** Delete stop word */
-const deleteStopWord = (typeword: "titlestopword" | "descriptionstopword") => async (c: AppContext) => {
+const deleteStopWord = (table: "titlestopword" | "descriptionstopword") => async (c: AppContext) => {
   const id = Number(c.req.param('id'))
-  await getClient(c).from(typeword).delete().eq("id", id)
+  await getClient(c).from(Table[table]).delete().eq("id", id)
   return c.body(null, 204)
 }
 
@@ -151,7 +152,7 @@ api.get('/stop-words/title/apply', async (c) => {
     return c.json({ banned: 0 }, 200)
   }
   const client = getClient(c)
-  const { data } = await client.from("vacancies")
+  const { data } = await client.from(Table.vacancies)
     .select<string, Vacancy>('v_id, title')
     .neq("status", VacancyStatus.BANNED)
 
@@ -162,7 +163,7 @@ api.get('/stop-words/title/apply', async (c) => {
     .filter((value): value is number => typeof value !== "boolean");
 
   if (banned && banned.length > 0) {
-    await client.from("vacancies")
+    await client.from(Table.vacancies)
       .update({ status: VacancyStatus.BANNED })
       .in("v_id", banned)
   }
@@ -185,7 +186,7 @@ api.get('/stop-words/description/apply', async (c) => {
     }
     query = fetchVacanciesByCategoryId(c, categoryObj.id)
   } else {
-    query = client.from("vacancies").select("*")
+    query = client.from(Table.vacancies).select("*")
   }
 
   query = query.neq("status", VacancyStatus.BANNED)
@@ -218,7 +219,7 @@ api.get('/stop-words/description/apply', async (c) => {
     if (findWordsInString(words, desc.description)) {
       bannedVacancies.push(v.v_id)
     } else if (desc.salary && desc.salary !== v.salary) {
-      await client.from("vacancies")
+      await client.from(Table.vacancies)
         .update({ salary: desc.salary})
         .eq("id", v.v_id)
     }
@@ -226,12 +227,12 @@ api.get('/stop-words/description/apply', async (c) => {
   }
 
   if (bannedVacancies.length > 0) {
-    await client.from("vacancies")
+    await client.from(Table.vacancies)
       .update({ status: VacancyStatus.BANNED })
       .in("v_id", bannedVacancies)
   }
   if (removedVacancies.length > 0) {
-    await client.from("vacancies")
+    await client.from(Table.vacancies)
       .delete()
       .in("v_id", removedVacancies)
   }
@@ -246,6 +247,4 @@ api.get('/stop-words/description/apply', async (c) => {
 const app = new Hono()
 app.route('/api', api)
 
-export const myApp = app
-export type MyAppType = typeof myApp;
 Deno.serve(app.fetch)

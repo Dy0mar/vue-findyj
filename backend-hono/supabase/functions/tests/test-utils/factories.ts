@@ -5,7 +5,7 @@ import { Factory } from "./Factory.ts";
 
 export class CategoryFactory extends Factory<Omit<Category, "id">> {
   override getTableName() {
-    return "categories" as const
+    return "test_categories" as const
   }
 
   override generate() {
@@ -18,7 +18,7 @@ export class CategoryFactory extends Factory<Omit<Category, "id">> {
 
 export class TitleStopWordFactory extends Factory<Omit<StopWord, "id">> {
   override getTableName() {
-    return "titlestopword" as const
+    return "test_titlestopword" as const
   }
 
   override generate() {
@@ -30,7 +30,7 @@ export class TitleStopWordFactory extends Factory<Omit<StopWord, "id">> {
 
 export class DescriptionStopWordFactory extends Factory<Omit<StopWord, "id">> {
   override getTableName() {
-    return "descriptionstopword" as const
+    return "test_descriptionstopword" as const
   }
 
   override generate() {
