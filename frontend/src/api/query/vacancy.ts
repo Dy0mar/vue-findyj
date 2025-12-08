@@ -53,7 +53,6 @@ class VacancyQuery {
       onMutate: async ({ v_id, status, read }) => {
         await queryClient.cancelQueries({ queryKey: [ROOT_QUERY_KEY], exact: false });
 
-        // fixme: rebuild pages when item has been removed
         // mark read all cached vacancy in caches
         if (read !== undefined) {
           queryClient.setQueriesData<Pages<VacancyDetailOut>>(
@@ -80,24 +79,46 @@ class VacancyQuery {
             .forEach((scope) => {
               const queryKey = scope[0] as VacancyListQueryKey;
               queryClient.setQueryData<Pages<VacancyDetailOut>>(queryKey, (currentData) => {
-                if (!currentData?.pages) {
+                if (!currentData?.pages || currentData.pages.length === 0) {
                   return currentData;
                 }
 
-                const pages = currentData.pages.map((page) => {
-                  const found = page.items.find((item) => item.v_id === v_id);
-                  if (found) {
-                    return {
-                      items: page.items.filter((item) => item.v_id !== v_id),
-                      count: page.count - 1,
-                    };
-                  }
-                  return page;
-                });
+                // Correctly get the total count from the first page.
+                const oldTotalCount = currentData.pages[0]!.count;
+                const newTotalCount = Math.max(0, oldTotalCount - 1);
+
+                // Flatten all items from all pages into a single array.
+                const allItems = currentData.pages.flatMap((p) => p.items);
+                const itemIndex = allItems.findIndex((item) => item.v_id === v_id);
+
+                // If the item to be removed is not found, return the original data.
+                if (itemIndex === -1) {
+                  return currentData;
+                }
+
+                // Create a new array of items without the removed item.
+                const newItems = allItems.filter((item) => item.v_id !== v_id);
+
+                // If there are no items left in the cache, return an empty state.
+                if (newItems.length === 0) {
+                  return { pages: [], pageParams: [] };
+                }
+
+                // Re-create the pages from the new list of items.
+                const newPages = [];
+                for (let i = 0; i < newItems.length; i += this.PER_PAGE) {
+                  newPages.push({
+                    items: newItems.slice(i, i + this.PER_PAGE),
+                    count: newTotalCount, // Use the correct total count.
+                  });
+                }
+
+                // Generate new page parameters (offsets).
+                const newPageParams = newPages.map((_, index) => index * this.PER_PAGE);
 
                 return {
-                  ...currentData,
-                  pages,
+                  pages: newPages,
+                  pageParams: newPageParams,
                 };
               });
             });

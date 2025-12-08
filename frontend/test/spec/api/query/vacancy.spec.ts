@@ -1,6 +1,6 @@
 import { http } from "msw";
 import { ref, unref } from "vue";
-import { beforeAll, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import type { Pages } from "src/api/query/types";
 import type { VacancyDetailOut } from "src/types/models/vacancy/vacancy";
 import { queryClient } from "src/queryClient";
@@ -80,6 +80,9 @@ describe("vacancyQuery", () => {
 
   describe("patchVacancy", () => {
     beforeEach(restoreQueryParams);
+    afterEach(() => {
+      queryClient.clear();
+    });
 
     beforeAll(() => {
       server.use(
@@ -143,6 +146,46 @@ describe("vacancyQuery", () => {
         query.vacanciesList(status, category, search).queryKey,
       );
       expect(data?.pages[0]?.items).toStrictEqual(expect.not.arrayContaining([expect.objectContaining({ v_id })]));
+    });
+
+    it("should shift the item to the previous page", async () => {
+      const page1 = new VacancyDetailOutFactory({ status: VacancyStatus.NEW }).paginated(12);
+      const page2 = new VacancyDetailOutFactory({ status: VacancyStatus.NEW }).paginated(12, 2);
+
+      const v_id = page1.items[0]!.v_id;
+      const pages = {
+        pages: [page1, page2],
+        pageParams: [0, 10],
+      } satisfies Pages<VacancyDetailOut>;
+
+      queryClient.setQueryData(query.vacanciesList(status, category, search).queryKey, pages);
+
+      await query.patchVacancy().onMutate({ v_id, status: VacancyStatus.BANNED });
+
+      const data = queryClient.getQueryData<Pages<VacancyDetailOut>>(
+        query.vacanciesList(status, category, search).queryKey,
+      );
+      expect(data?.pages[0]?.items.length).toBe(10);
+    });
+
+    it("If there are no items left in the cache, return an empty state", async () => {
+      const page1 = new VacancyDetailOutFactory({ status: VacancyStatus.NEW }).paginated(1);
+
+      const v_id = page1.items[0]!.v_id;
+      const pages = {
+        pages: [page1],
+        pageParams: [0],
+      } satisfies Pages<VacancyDetailOut>;
+
+      queryClient.setQueryData(query.vacanciesList(status, category, search).queryKey, pages);
+
+      await query.patchVacancy().onMutate({ v_id, status: VacancyStatus.BANNED });
+
+      const data = queryClient.getQueryData<Pages<VacancyDetailOut>>(
+        query.vacanciesList(status, category, search).queryKey,
+      );
+      expect(data?.pages.length).toBe(0);
+      expect(data?.pageParams.length).toBe(0);
     });
 
     it("should not remove from cache entries by id if not found", async () => {
