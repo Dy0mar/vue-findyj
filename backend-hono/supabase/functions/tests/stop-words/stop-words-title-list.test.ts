@@ -1,6 +1,6 @@
 import { assertEquals } from '@std/assert'
-import { TitleStopWordFactory } from "./test-utils/factories.ts";
-import { request } from "./supabase.ts";
+import { TitleStopWordFactory } from "../test-utils/factories.ts";
+import { request } from "../supabase.ts";
 
 const url = "/stop-words/title"
 const factory = new TitleStopWordFactory()

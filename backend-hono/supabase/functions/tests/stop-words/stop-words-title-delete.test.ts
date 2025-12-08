@@ -1,11 +1,11 @@
 import { assertEquals } from '@std/assert'
-import { TitleStopWordFactory } from "./test-utils/factories.ts";
-import { request } from "./supabase.ts";
+import { TitleStopWordFactory } from "../test-utils/factories.ts";
+import { request } from "../supabase.ts";
 
 const url = "/stop-words/title"
 const factory = new TitleStopWordFactory()
 
-Deno.test('/stop-words/title delete', async (t) => {
+Deno.test('Stop Words Title - delete', async (t) => {
   await t.step("Should delete a stop word", async () => {
     const { data, test } = await factory.create()
     await test(async () => {
