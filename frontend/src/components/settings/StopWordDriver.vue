@@ -40,13 +40,13 @@ const visible = defineModel<boolean>("visible", { required: true });
 <template>
   <Drawer v-model:visible="visible" :header position="right">
     <ul class="list-none">
-      <li v-for="item in items" :key="item.id" class="flex justify-between space-y-4">
+      <li v-for="item in items" :key="item.id" class="flex justify-between space-y-4 items-baseline">
         <span>{{ item.word }}</span>
         <Button
-          icon="pi pi-times"
+          icon="pi pi-trash"
           severity="danger"
           rounded
-          variant="outlined"
+          variant="text"
           aria-label="ConfirmDelete"
           size="small"
           @click="confirmDelete(item)"
