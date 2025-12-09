@@ -13,7 +13,6 @@ import { EmitterKey } from "src/symbols";
 import { queryClient } from "src/queryClient";
 import router from "src/router";
 import App from "src/App.vue";
-import "primeicons/primeicons.css";
 import "src/prototype";
 
 const app = createApp(App);

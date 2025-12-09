@@ -71,16 +71,16 @@ watch(categories, async (value) => {
       class="duration-300 dark:bg-zinc-800 transition-shadow bg-opacity-90 items-center w-full flex justify-between px-1.5 lg:pe-5 lg:ps-4 z-40"
     >
       <div class="flex items-center justify-between w-full h-16 gap-0 sm:gap-3">
-        <div class="flex flex-row 3xl:flex-1 items-center items-centers space-x-8">
-          <h1 class="text-lg text-nowrap text-zinc-100">Job tracker</h1>
+        <div class="flex flex-row 3xl:flex-1 items-center items-centers space-x-2 sm:space-x-8">
+          <h1 class="text-lg text-nowrap text-zinc-100 hidden sm:block">Job tracker</h1>
           <InputText
             v-model="term"
             placeholder="Search"
             size="small"
-            class="bg-surface-700/30 text-surface-100 border-surface-600 hover:border-pink-400 focus:border-pink-400 placeholder:text-surface-400 text-surface-300"
+            class="bg-surface-700/30 hidden sm:block text-surface-100 border-surface-600 hover:border-pink-400 focus:border-pink-400 placeholder:text-surface-400 text-surface-300"
           />
 
-          <div class="flex space-x-4 items-center text-nowrap p-2 rounded-lg">
+          <div class="flex space-x-1 sm:space-x-4 items-center text-nowrap sm:p-2 rounded-lg">
             <Button
               v-for="{ status, label } in statuses"
               :key="status"
@@ -97,7 +97,7 @@ watch(categories, async (value) => {
             />
           </div>
 
-          <div class="flex space-x-4 items-center text-nowrap p-2 rounded-lg">
+          <div class="flex space-x-1 sm:space-x-4 items-center text-nowrap p-2 rounded-lg">
             <Button
               v-for="category in categories"
               :key="category"

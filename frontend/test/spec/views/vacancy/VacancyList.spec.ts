@@ -5,6 +5,7 @@ import { aMounter, sMounter } from "test/utils/options";
 import { VacancyDetailOutFactory } from "test/utils/factories/vacancy";
 import { HttpResponse, server } from "test/utils/server";
 import { AxiosResponseFactory } from "test/utils/factories/generic";
+import { getByRole } from "test/utils/selector";
 import { VacancyStatus } from "src/constants";
 import { vacancyQuery } from "src/api/query/vacancy";
 import { bus, EventNames } from "src/bus";
@@ -66,7 +67,7 @@ describe("VacancyList", () => {
 
   it("should show loading text", async () => {
     const wrapper = syncRender();
-    expect(wrapper.find("i.pi-spin").exists()).toBe(true);
+    expect(getByRole(wrapper, "progressbar").exists()).toBe(true);
   });
 
   it("api client should be called on mounted", async () => {

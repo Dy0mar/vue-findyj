@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { sMounter } from "test/utils/options";
 import { VacancyStatus } from "src/constants";
 import VacancyView from "src/views/vacancy/VacancyView.vue";
+import { getByRole } from "test/utils/selector";
 
 describe("VacancyView", () => {
   const render = sMounter(VacancyView, { global: { stubs: { VacancyList: true } } });
@@ -58,5 +59,36 @@ describe("VacancyView", () => {
     await router.setQuery({ category: "Python", status: "foo" });
     const wrapper = render();
     expect(wrapper.findComponent({ name: "VacancyList" }).props("status")).toBe(VacancyStatus.NEW);
+  });
+
+  describe("sidebar", () => {
+    it("sidebar should be hidden", () => {
+      const wrapper = render();
+      expect(wrapper.findComponent({ name: "Drawer" }).exists()).toBe(false);
+    });
+
+    it("sidebar should be visible", () => {
+      Object.defineProperty(window, "innerWidth", { writable: true, value: 500 });
+      const wrapper = render();
+      expect(wrapper.findComponent({ name: "Drawer" }).exists()).toBe(true);
+    });
+
+    it("sidebar should change local visible", async () => {
+      Object.defineProperty(window, "innerWidth", { writable: true, value: 500 });
+      const wrapper = render();
+      await wrapper.findComponent({ name: "Drawer" }).vm.$emit("update:visible", true);
+      // @ts-expect-error private property
+      expect(wrapper.vm.visible).toBe(true);
+    });
+
+    it("sidebar should render iframe", async () => {
+      Object.defineProperty(window, "innerWidth", { writable: true, value: 500 });
+      const router = getRouter();
+      await router.setQuery({ category: "Python" });
+      const wrapper = render();
+      await wrapper.findComponent({ name: "VacancyList" }).vm.$emit("selected", { link: "https://foo.bar" });
+
+      expect(getByRole(wrapper, "dialog").find("iframe").exists()).toBe(true);
+    });
   });
 });

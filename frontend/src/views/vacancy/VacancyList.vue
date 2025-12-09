@@ -2,6 +2,7 @@
 import { computed, ref, toRef, watch } from "vue";
 import { useInfiniteQuery, useMutation } from "@tanstack/vue-query";
 import Button from "primevue/button";
+import ProgressSpinner from "primevue/progressspinner";
 import type { VacancyDetailOut } from "src/types/models/vacancy/vacancy";
 import { EventNames, useBus } from "src/hooks/useBus";
 import { useMessage } from "src/hooks/useMessage";
@@ -100,7 +101,7 @@ watch(selected, (value) => {
     />
 
     <div class="flex justify-center">
-      <i v-if="isFetching" class="pi pi-spin pi-spinner text-3xl text-center text-pink-500"></i>
+      <ProgressSpinner class="h-10 w-10" />
     </div>
   </div>
 </template>
