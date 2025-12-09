@@ -9,7 +9,7 @@ export const routes = [
     redirect: { name: Names.VACANCY.INDEX },
     children: [
       {
-        path: "vacancies",
+        path: "",
         name: Names.VACANCY.INDEX,
         /* c8 ignore next */
         component: () => import("src/views/vacancy/VacancyView.vue"),
