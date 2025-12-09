@@ -12,6 +12,15 @@ export const FAura = definePreset(AuraBase, {
     },
   },
   components: {
+    select: {
+      colorScheme: {
+        dark: {
+          overlay: {
+            background: "{zinc.800}",
+          },
+        },
+      },
+    },
     toast: {
       colorScheme: {
         dark: {
