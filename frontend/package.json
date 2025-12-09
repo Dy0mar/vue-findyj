@@ -27,6 +27,7 @@
     "@tanstack/vue-query-devtools": "^6.1.2",
     "axios": "^1.13.2",
     "mitt": "^3.0.1",
+    "primeicons": "^7.0.0",
     "primevue": "^4.5.2",
     "tailwindcss": "^4.1.17",
     "tailwindcss-primeui": "^0.6.1",
