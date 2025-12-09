@@ -90,7 +90,11 @@ watch(selected, (value) => {
           { 'border border-pink-600 bg-pink-200': selected?.v_id === vacancy.v_id },
         ]"
       />
+      <div v-if="!isFetching && vacancies.length === 0" class="flex justify-center">
+        <div class="text-pink-600">No items</div>
+      </div>
     </TransitionGroup>
+
     <Button
       v-if="vacancies?.length < count && !isFetching"
       label="Load more"
@@ -99,7 +103,6 @@ watch(selected, (value) => {
       class="bg-surface-200/30 border-surface-600 hover:border-pink-400 text-primary-900"
       @click="() => fetchNextPage()"
     />
-
     <div v-if="isFetching" class="flex justify-center">
       <ProgressSpinner class="h-10 w-10" />
     </div>

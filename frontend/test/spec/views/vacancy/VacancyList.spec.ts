@@ -88,6 +88,20 @@ describe("VacancyList", () => {
 
   const loadMoreSelector = "[aria-label='Load more']";
 
+  describe("empty message", () => {
+    it("should show empty message", async () => {
+      responseMock(new VacancyDetailOutFactory().paginated(0));
+      const wrapper = await render();
+      expect(wrapper.text()).toContain("No items");
+    });
+
+    it("should not show empty message", async () => {
+      responseMock(new VacancyDetailOutFactory().paginated(1));
+      const wrapper = await render();
+      expect(wrapper.text()).not.toContain("No items");
+    });
+  });
+
   describe("empty pagination", () => {
     it("button load more should be hide", async () => {
       responseMock(new VacancyDetailOutFactory().paginated(1));

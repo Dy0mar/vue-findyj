@@ -3,6 +3,7 @@ import { computed, ref } from "vue";
 import { useRoute } from "vue-router";
 import Drawer from "primevue/drawer";
 import type { VacancyDetailOut } from "src/types/models/vacancy/vacancy";
+import { isMobile } from "src/utils/adaptive";
 import { VacancyStatus } from "src/constants";
 import VacancyList from "src/views/vacancy/VacancyList.vue";
 
@@ -35,11 +36,11 @@ const search = computed<string | undefined>(() => {
 });
 
 // yes, I know it's not reactive, but I don't care.
-const isMobile = window.innerWidth < 640;
+const isMobile_ = isMobile();
 </script>
 
 <template>
-  <div class="sm:w-1/3 bg-white border-r border-gray-200 overflow-y-auto p-2 sm:p-6">
+  <div class="w-full sm:w-1/3 bg-white border-r border-gray-200 overflow-y-auto p-2 sm:p-6">
     <VacancyList
       v-if="category"
       :status="status"
@@ -56,7 +57,7 @@ const isMobile = window.innerWidth < 640;
     <iframe v-if="src" :src="src" width="100%" class="h-full w-full" frameborder="0" />
   </div>
 
-  <Drawer v-if="isMobile" v-model:visible="visible" position="right" :show-close-icon="false">
+  <Drawer v-if="isMobile_" v-model:visible="visible" position="right" :show-close-icon="false">
     <iframe v-if="src" :src="src" width="100%" class="h-full w-full" frameborder="0" />
   </Drawer>
 </template>

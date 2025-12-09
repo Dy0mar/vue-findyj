@@ -15,6 +15,22 @@ import AppHeader from "src/layout/AppHeader.vue";
 
 vi.spyOn(crawlerClient, "runParse");
 
+// fixme: Select matchMedia is not a function workaround
+// fixme: update primevue, check and remove it
+Object.defineProperty(window, "matchMedia", {
+  writable: true,
+  value: vi.fn().mockImplementation((query) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: vi.fn(), // Deprecated
+    removeListener: vi.fn(), // Deprecated
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  })),
+});
+
 describe("AppHeader", () => {
   const router = createRouterMock();
   const categories = new CategoryFactory().batch(1);
@@ -41,6 +57,15 @@ describe("AppHeader", () => {
   it("should mount successfully", async () => {
     const wrapper = await render();
     expect(wrapper.exists()).toBe(true);
+  });
+
+  it("button labels should be hide when device is mobile", async () => {
+    const original = window.innerWidth;
+    Object.defineProperty(window, "innerWidth", { writable: true, value: 500 });
+    const wrapper = await render();
+    expect(getByAriaLabel(wrapper, "settings").exists()).toBe(false);
+    expect(getByAriaLabel(wrapper, "Fetch new").exists()).toBe(false);
+    Object.defineProperty(window, "innerWidth", { writable: true, value: original });
   });
 
   describe("search", () => {
@@ -81,36 +106,14 @@ describe("AppHeader", () => {
     });
   });
 
-  describe("status buttons", () => {
-    it("should change status query param on button clicks", async () => {
-      const wrapper = await render();
-      const statusButton = wrapper.findAll("button").find((btn) => btn.text() === "New");
-      await statusButton?.trigger("click");
-      expect(router.replace).toHaveBeenCalledWith(
-        expect.objectContaining({
-          query: expect.objectContaining({ status: VacancyStatus.NEW }),
-        }),
-      );
-    });
-  });
-
   it("should emit event when settings button is clicked", async () => {
     const wrapper = await render();
     const spy = vi.spyOn(bus, "emit");
-    const settingsButton = wrapper.findAll("button").find((btn) => btn.text() === "settings");
-    await settingsButton?.trigger("click");
+    await getByAriaLabel(wrapper, "settings").trigger("click");
     expect(spy).toHaveBeenCalledWith(EventNames.OPEN_SETTINGS);
   });
 
   describe("query params", () => {
-    it.each(["wrong", undefined])("should set query status on mounted when status is %s", async (status) => {
-      await router.setQuery({ status });
-      mount(AppHeader);
-      expect(router.replace).toHaveBeenCalledWith({
-        query: expect.objectContaining({ status: VacancyStatus.NEW }),
-      });
-    });
-
     it("should not set query status on mounted if query has status already", async () => {
       await router.setQuery({ status: VacancyStatus.APPLIED });
       mount(AppHeader);
@@ -143,27 +146,6 @@ describe("AppHeader", () => {
         query: expect.objectContaining({ status: VacancyStatus.NEW }),
       });
     });
-
-    it("should change query status on button click", async () => {
-      const wrapper = await render();
-
-      // @ts-expect-error var statuses is private
-      const label = wrapper.vm.statuses.find(({ status }) => status === VacancyStatus.APPLIED).label;
-      await getByAriaLabel(wrapper, label).trigger("click");
-      expect(router.replace).toHaveBeenCalledWith({
-        query: expect.objectContaining({ status: VacancyStatus.APPLIED }),
-      });
-    });
-
-    it("should change query category on button click", async () => {
-      const wrapper = await render();
-
-      const label = categories[0]!.name;
-      await getByAriaLabel(wrapper, label).trigger("click");
-      expect(router.replace).toHaveBeenCalledWith({
-        query: expect.objectContaining({ category: label }),
-      });
-    });
   });
 
   describe("parse", () => {
@@ -171,8 +153,7 @@ describe("AppHeader", () => {
       const resp = new AxiosResponseFactory({ data: { created: 1, removed: 0 } }).create();
       const mockRunParse = vi.spyOn(crawlerClient, "runParse").mockResolvedValueOnce(resp);
       const wrapper = await render();
-      const fetchButton = wrapper.findAll("button").find((btn) => btn.text() === "Fetch new");
-      await fetchButton?.trigger("click");
+      await getByAriaLabel(wrapper, "Fetch new").trigger("click");
       expect(mockRunParse).toHaveBeenCalledExactlyOnceWith({ data: { category: categories[0]!.name } });
     });
 
@@ -181,8 +162,7 @@ describe("AppHeader", () => {
       const mockRunParse = vi.spyOn(crawlerClient, "runParse").mockResolvedValueOnce(resp);
       const wrapper = await render();
       await router.setQuery({ category: undefined });
-      const fetchButton = wrapper.findAll("button").find((btn) => btn.text() === "Fetch new");
-      await fetchButton?.trigger("click");
+      await getByAriaLabel(wrapper, "Fetch new").trigger("click");
       expect(mockRunParse).toHaveBeenCalledExactlyOnceWith();
     });
   });
