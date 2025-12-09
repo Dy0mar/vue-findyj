@@ -28,12 +28,6 @@ api.use('*', cors({
 )
 api.use('*', supabase())
 
-/** ------------ AUTH ------------ */
-
-api.get('/auth/check', (c) => {
-  return c.json({ message: "ok" }, 200)
-})
-
 
 /** ------------ CATEGORIES ------------ */
 
