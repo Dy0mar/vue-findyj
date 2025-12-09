@@ -10,7 +10,7 @@ bus.on(EventNames.COUNT_VACANCIES, (value) => {
 </script>
 
 <template>
-  <footer class="mt-auto border-t border-surface/10 py-2 dark:bg-zinc-800 transition-shadow bg-opacity-90 duration-300">
+  <footer class="mt-auto py-2 dark:bg-zinc-800 transition-shadow bg-opacity-90 duration-300">
     <div class="mx-auto px-4 sm:px-6 lg:px-8 text-center text-zinc-100/90">
       <div class="flex items-center justify-between">
         <div>Vacancies: {{ count }}</div>

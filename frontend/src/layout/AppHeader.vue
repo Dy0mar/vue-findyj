@@ -68,7 +68,7 @@ watch(categories, async (value) => {
 <template>
   <div class="sticky top-0">
     <nav
-      class="border border-bottom border-surface/10 duration-300 dark:bg-zinc-800 transition-shadow bg-opacity-90 items-center w-full flex justify-between px-1.5 lg:pe-5 lg:ps-4 z-40"
+      class="duration-300 dark:bg-zinc-800 transition-shadow bg-opacity-90 items-center w-full flex justify-between px-1.5 lg:pe-5 lg:ps-4 z-40"
     >
       <div class="flex items-center justify-between w-full h-16 gap-0 sm:gap-3">
         <div class="flex flex-row 3xl:flex-1 items-center items-centers space-x-8">
