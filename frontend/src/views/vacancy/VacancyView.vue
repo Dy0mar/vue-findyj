@@ -59,6 +59,4 @@ const isMobile = window.innerWidth < 640;
   <Drawer v-if="isMobile" v-model:visible="visible" position="right" :show-close-icon="false">
     <iframe v-if="src" :src="src" width="100%" class="h-full w-full" frameborder="0" />
   </Drawer>
-
-  <div>src {{ src }}</div>
 </template>

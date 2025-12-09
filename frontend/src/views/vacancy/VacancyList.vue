@@ -100,7 +100,7 @@ watch(selected, (value) => {
       @click="() => fetchNextPage()"
     />
 
-    <div class="flex justify-center">
+    <div v-if="isFetching" class="flex justify-center">
       <ProgressSpinner class="h-10 w-10" />
     </div>
   </div>
