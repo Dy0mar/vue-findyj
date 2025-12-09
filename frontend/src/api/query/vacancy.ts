@@ -29,6 +29,7 @@ class VacancyQuery {
     search: Ref<string | undefined>,
   ) {
     return {
+      staleTime: Infinity,
       queryKey: [ROOT_QUERY_KEY, status, category, search],
       initialPageParam: 0,
       queryFn: async ({ queryKey, pageParam }) => {

@@ -13,6 +13,7 @@ class CategoryQuery {
    */
   categoryList() {
     return {
+      staleTime: Infinity,
       queryKey: [CATEGORY_LIST_QUERY_KEY],
       queryFn: async () => (await this.client.categoryList()).data,
     } satisfies UseQueryOptions<Category[], CategoryListQueryKey>;
