@@ -7,7 +7,7 @@ export const enum EventNames {
 }
 
 type BusEvents = {
-  [EventNames.REFETCH_VACANCIES]: undefined;
+  [EventNames.REFETCH_VACANCIES]: string | undefined;
   [EventNames.OPEN_SETTINGS]: undefined;
   [EventNames.COUNT_VACANCIES]: number;
 };

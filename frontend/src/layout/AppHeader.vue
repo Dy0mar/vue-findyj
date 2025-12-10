@@ -33,8 +33,10 @@ const { loading, requestAsync } = useRequest(() => {
 });
 
 async function runParse() {
-  await requestAsync();
-  bus.emit(EventNames.REFETCH_VACANCIES);
+  const r = await requestAsync();
+  if (r?.data) {
+    bus.emit(EventNames.REFETCH_VACANCIES, `Created: ${r.data.created}, Removed: ${r.data.removed}`);
+  }
 }
 
 watch(term, async (value) => {

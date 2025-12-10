@@ -14,7 +14,7 @@ export function useRequest<T>(cb: () => Answer<T>, afterCb?: () => void) {
   async function requestAsync() {
     try {
       loading.value = true;
-      await cb();
+      return await cb();
     } catch (e) {
       console.error(e);
     } finally {

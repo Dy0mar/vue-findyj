@@ -165,5 +165,17 @@ describe("AppHeader", () => {
       await getByAriaLabel(wrapper, "Fetch new").trigger("click");
       expect(mockRunParse).toHaveBeenCalledExactlyOnceWith();
     });
+
+    it("should call bus event", async () => {
+      const resp = new AxiosResponseFactory({ data: { created: 2, removed: 5 } }).create();
+
+      vi.spyOn(crawlerClient, "runParse").mockResolvedValueOnce(resp);
+      const spy = vi.spyOn(bus, "emit");
+
+      const wrapper = await render();
+      await getByAriaLabel(wrapper, "Fetch new").trigger("click");
+      await flushPromises();
+      expect(spy).toHaveBeenCalledExactlyOnceWith(EventNames.REFETCH_VACANCIES, "Created: 2, Removed: 5");
+    });
   });
 });
