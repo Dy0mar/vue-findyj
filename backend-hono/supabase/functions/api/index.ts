@@ -83,11 +83,18 @@ api.get('/vacancies', async (c) => {
   }
   query = query.range(pageOffset, pageOffset + pageLimit - 1).order('v_id', { ascending: true })
 
-  const { data: items, error, count } = await query
+  const { data, error, count } = await query
   if (error) {
     throw new HTTPException(500, { message: error.message });
   }
-  return c.json({ items, count }, 200)
+  return c.json({
+    items: data.map((item) => ({
+      ...item,
+      category: item.categories?.name || null,
+      categories: undefined
+    })),
+    count
+  }, 200)
 })
 
 
