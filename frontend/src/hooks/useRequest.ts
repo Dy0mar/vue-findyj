@@ -19,9 +19,9 @@ export function useRequest<T>(cb: () => Answer<T>, afterCb?: () => void) {
       console.error(e);
     } finally {
       loading.value = false;
-    }
-    if (afterCb) {
-      afterCb();
+      if (afterCb) {
+        afterCb();
+      }
     }
   }
 

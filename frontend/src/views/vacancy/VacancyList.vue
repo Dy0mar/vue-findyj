@@ -48,6 +48,7 @@ const vacancies = computed<VacancyDetailOut[]>(() => {
  */
 async function changeStatus({ v_id, status }: VacancyDetailOut) {
   selected.value = undefined;
+  emit("selected", undefined);
   await patchVacancy({ v_id, status });
   successMessage("Status change", "Vacancy status changed successfully");
 }
@@ -57,7 +58,7 @@ async function changeStatus({ v_id, status }: VacancyDetailOut) {
  */
 async function onCardSelect(vacancy: VacancyDetailOut) {
   selected.value = vacancy;
-
+  emit("selected", vacancy);
   if (!vacancy.read) {
     await patchVacancy({ v_id: vacancy.v_id, read: true });
   }
@@ -67,10 +68,6 @@ const count = computed(() => (data.value && data.value.pages[0] ? data.value.pag
 
 watch(count, (value) => {
   bus.emit(EventNames.COUNT_VACANCIES, value);
-});
-
-watch(selected, (value) => {
-  emit("selected", value);
 });
 </script>
 
