@@ -3,8 +3,9 @@ import Button from "primevue/button";
 import type { VacancyDetailOut } from "src/types/models/vacancy/vacancy";
 import { VacancyStatus } from "src/constants";
 
-defineEmits<{
+const emit = defineEmits<{
   (e: "change-status", value: VacancyDetailOut): void;
+  (e: "selected"): void;
 }>();
 
 defineProps<{
@@ -17,11 +18,30 @@ const buttons = [
   { status: VacancyStatus.BANNED, label: "ban!", severity: "danger" },
   { status: VacancyStatus.APPLIED, label: "applied", severity: "success" },
 ] as const;
+
+/**
+ * Handles clicks on the card itself.
+ * This implementation solves a common issue on mobile devices where a single tap can fire
+ * both touch and click events. Simply using `@click.stop` on the buttons is often
+ * unreliable for preventing the parent's click handler from firing (a "ghost click").
+ *
+ * Instead of trying to stop event propagation, this handler inspects the event's origin.
+ * If the click originated from within a button, it is ignored. Otherwise, it emits the
+ * `selected` event. This is a more robust and reliable pattern.
+ * @param {MouseEvent} event The DOM click event.
+ */
+function onCardClick(event: MouseEvent) {
+  if ((event.target as HTMLElement).closest("button")) {
+    return;
+  }
+  emit("selected");
+}
 </script>
 
 <template>
   <div
     class="rounded-lg border border-gray-200 shadow-sm overflow-hidden transition-all hover:shadow-md hover:bg-pink-100"
+    @click="onCardClick"
   >
     <div class="p-6">
       <div class="flex justify-between items-start mb-2">
@@ -47,7 +67,7 @@ const buttons = [
           :severity="severity"
           :class="{ 'ml-auto': idx === buttons.length - 1 }"
           :disabled="vacancy.status === status"
-          @click.stop="$emit('change-status', { ...vacancy, status })"
+          @click="$emit('change-status', { ...vacancy, status })"
         />
       </div>
     </div>

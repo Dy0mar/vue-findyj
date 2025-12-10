@@ -66,6 +66,18 @@ describe("VacancyCard", () => {
     expect(getByAriaLabel(wrapper, label).attributes("disabled")).toBeDefined();
   });
 
+  it("should emit event selected from the component", async () => {
+    const wrapper = render();
+    await wrapper.trigger("click");
+    expect(wrapper.emitted("selected")).toBeDefined();
+  });
+
+  it("should not emit event selected from the component when button clicked", async () => {
+    const wrapper = render();
+    await wrapper.find("button").trigger("click");
+    expect(wrapper.emitted("selected")).toBeUndefined();
+  });
+
   it("should emit event from the component", async () => {
     const wrapper = render();
 

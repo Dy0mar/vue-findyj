@@ -55,7 +55,7 @@ async function changeStatus({ v_id, status }: VacancyDetailOut) {
 /**
  * Handle vacancy click event
  */
-async function handleVacancyClick(vacancy: VacancyDetailOut) {
+async function onCardSelect(vacancy: VacancyDetailOut) {
   selected.value = vacancy;
 
   if (!vacancy.read) {
@@ -81,14 +81,14 @@ watch(selected, (value) => {
         v-for="vacancy in vacancies"
         :key="vacancy.v_id"
         :vacancy="vacancy"
-        @change-status="changeStatus"
-        @click="handleVacancyClick(vacancy)"
         :class="[
           { 'bg-sky-300': vacancy.status === VacancyStatus.NEW && !vacancy.read && selected?.v_id !== vacancy.v_id },
           { 'bg-sky-50': vacancy.status === VacancyStatus.NEW && selected?.v_id !== vacancy.v_id },
           { 'bg-red-200': vacancy.status === VacancyStatus.BANNED && selected?.v_id !== vacancy.v_id },
           { 'border border-pink-600 bg-pink-200': selected?.v_id === vacancy.v_id },
         ]"
+        @change-status="changeStatus"
+        @selected="onCardSelect(vacancy)"
       />
       <div v-if="!isFetching && vacancies.length === 0" class="flex justify-center">
         <div class="text-pink-600">No items</div>
