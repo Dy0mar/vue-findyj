@@ -72,8 +72,11 @@ class VacancyQuery {
               };
             },
           );
+          return;
+        }
+
+        if (status) {
           // remove vacancy from all caches
-        } else if (status !== undefined) {
           queryClient
             .getQueriesData<Pages<VacancyDetailOut>>({ queryKey: [ROOT_QUERY_KEY], exact: false })
             .filter((scope) => (scope[0] as VacancyListQueryKey)[1] !== status)
@@ -90,12 +93,18 @@ class VacancyQuery {
 
                 // Flatten all items from all pages into a single array.
                 const allItems = currentData.pages.flatMap((p) => p.items);
-                const itemIndex = allItems.findIndex((item) => item.v_id === v_id);
+                const item = allItems.find((item) => item.v_id === v_id);
 
                 // If the item to be removed is not found, return the original data.
-                if (itemIndex === -1) {
+                if (item === undefined) {
                   return currentData;
                 }
+
+                //
+                queryClient.invalidateQueries({
+                  queryKey: [ROOT_QUERY_KEY, status, item.category],
+                  exact: false,
+                });
 
                 // Create a new array of items without the removed item.
                 const newItems = allItems.filter((item) => item.v_id !== v_id);
@@ -123,6 +132,7 @@ class VacancyQuery {
                 };
               });
             });
+          return;
         }
       },
     } satisfies UseMutationOptions<
