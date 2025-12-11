@@ -134,11 +134,11 @@ describe("VacancyList", () => {
   });
 
   describe("bus event", () => {
-    it("should show success message", async () => {
+    it.each([undefined, "Created: 5, Removed: 5"])("should show success message", async (message) => {
       await render();
-      bus.emit(EventNames.REFETCH_VACANCIES);
+      bus.emit(EventNames.REFETCH_VACANCIES, message);
       await flushPromises();
-      expect(successMessage).toHaveBeenLastCalledWith("Refresh success", "Vacancies refreshed successfully");
+      expect(successMessage).toHaveBeenLastCalledWith("Refresh success", message ?? "Vacancies refreshed successfully");
     });
 
     it("api client should be called on the event", async () => {

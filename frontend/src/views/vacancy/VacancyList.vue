@@ -31,9 +31,9 @@ const { data, fetchNextPage, refetch, isFetching } = useInfiniteQuery(
 /**
  * Subscribe on bus event to refresh the vacancy list
  */
-bus.on(EventNames.REFETCH_VACANCIES, async () => {
+bus.on(EventNames.REFETCH_VACANCIES, async (message) => {
   await refetch();
-  successMessage("Refresh success", "Vacancies refreshed successfully");
+  successMessage("Refresh success", message ?? "Vacancies refreshed successfully");
 });
 
 const vacancies = computed<VacancyDetailOut[]>(() => {
