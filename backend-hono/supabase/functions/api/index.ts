@@ -81,7 +81,7 @@ api.get('/vacancies', async (c) => {
   if (search) {
     query = query.ilike('title', `%${search}%`)
   }
-  query = query.range(pageOffset, pageOffset + pageLimit - 1).order('v_id', { ascending: true })
+  query = query.range(pageOffset, pageOffset + pageLimit - 1).order('read', { ascending: true })
 
   const { data, error, count } = await query
   if (error) {
