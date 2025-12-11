@@ -15,7 +15,7 @@ bus.on(EventNames.OPEN_SETTINGS, () => {
 </script>
 
 <template>
-  <div class="flex flex-col h-screen bg-sky-50 font-sans overflow-hidden">
+  <div class="flex flex-col h-dvh bg-sky-50 font-sans overflow-hidden">
     <AppHeader />
     <main class="flex flex-1 min-h-0">
       <router-view />
