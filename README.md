@@ -1,5 +1,8 @@
 # Vacancy Dashboard
 
+[![CI Checks](https://github.com/Dy0mar/vue-findyj/actions/workflows/ci.yml/badge.svg)](https://github.com/Dy0mar/vue-findyj/actions/workflows/ci.yml)
+[![cov](https://Dy0mar.github.io/vue-findyj/badges/coverage.svg)](https://github.com/Dy0mar/vue-findyj/actions)
+
 This is a simple personal pet project - a vacancy dashboard built with Vue 3. It allows me to manage and filter job vacancies scraped from external sources.
 
 ## ✨ Features
@@ -26,6 +29,20 @@ This is a simple personal pet project - a vacancy dashboard built with Vue 3. It
 
 - [Supabase Edge Functions](https://supabase.com/docs/guides/functions)
 - Supabase Database (PostgreSQL)
+
+## 🧪 Testing
+
+This project uses [Vitest](https://vitest.dev/) for unit testing.
+
+### Running Tests
+
+To run the tests and generate a coverage report, navigate to the `frontend` directory and run the following command:
+
+```bash
+pnpm test:coverage
+```
+
+This will run the tests and generate a coverage report in the `frontend/coverage` directory. You can view the HTML report by opening `frontend/coverage/index.html` in your browser.
 
 ## 🧠 Why I Built This
 

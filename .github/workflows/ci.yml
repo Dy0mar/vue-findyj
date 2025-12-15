@@ -39,4 +39,9 @@ jobs:
         run: pnpm run type-check
 
       - name: Run Tests
-        run: pnpm run test:ci
+        run: pnpm run test:coverage
+
+      - name: Report Vitest Coverage
+        uses: davelosert/vitest-coverage-report-action@v2
+        with:
+          json-summary-path: './frontend/coverage/coverage-summary.json'
