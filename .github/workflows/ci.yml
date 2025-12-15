@@ -2,9 +2,9 @@ name: CI Checks
 
 on:
   push:
-    branches: [main, master]
+    branches: [master]
   pull_request:
-    branches: [main, master]
+    branches: [master]
 
 jobs:
   test-and-lint:
@@ -41,7 +41,5 @@ jobs:
       - name: Run Tests
         run: pnpm run test:coverage
 
-      - name: Report Vitest Coverage
-        uses: davelosert/vitest-coverage-report-action@v2
-        with:
-          working-directory: './frontend'
+      - name: Coveralls
+        uses: coverallsapp/github-action@v2
