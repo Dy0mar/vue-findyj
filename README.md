@@ -1,7 +1,7 @@
 # Vacancy Dashboard
 
 [![CI Checks](https://github.com/Dy0mar/vue-findyj/actions/workflows/ci.yml/badge.svg)](https://github.com/Dy0mar/vue-findyj/actions/workflows/ci.yml)
-[![cov](https://Dy0mar.github.io/vue-findyj/badges/coverage.svg)](https://github.com/Dy0mar/vue-findyj/actions)
+[![Coverage Status](https://coveralls.io/repos/github/Dy0mar/vue-findyj/badge.svg?branch=master)](https://coveralls.io/github/Dy0mar/vue-findyj?branch=master)
 
 This is a simple personal pet project - a vacancy dashboard built with Vue 3. It allows me to manage and filter job vacancies scraped from external sources.
 
