@@ -44,4 +44,5 @@ jobs:
       - name: Coveralls
         uses: coverallsapp/github-action@v2
         with:
-          base-path: "./frontend"
+          file: ./frontend/coverage/lcov.info
+          base-path: ./frontend

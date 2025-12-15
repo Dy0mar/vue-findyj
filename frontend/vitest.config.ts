@@ -14,7 +14,7 @@ export default mergeConfig(
       coverage: {
         all: true,
         provider: "v8",
-        reporter: ["html", "text", "json-summary", "json"],
+        reporter: ["html", "text", "json-summary", "json", "lcov"],
         skipFull: true,
         thresholds: {
           lines: 100,
