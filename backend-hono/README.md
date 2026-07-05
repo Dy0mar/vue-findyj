@@ -12,6 +12,7 @@ The development and testing environments rely on local Supabase services. Before
 
 ```bash
 npx supabase start
+npx supabase db reset
 ```
 
 ### 2. Running the Function

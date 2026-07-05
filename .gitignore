@@ -34,3 +34,9 @@ coverage
 .env.keys
 .env.local
 .env.*.local
+
+tmp
+
+backend-hono/supabase/.branches
+backend-hono/supabase/.temp
+supabase
