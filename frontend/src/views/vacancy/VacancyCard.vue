@@ -2,15 +2,18 @@
 import Button from "primevue/button";
 import type { VacancyDetailOut } from "src/types/models/vacancy/vacancy";
 import { VacancyStatus } from "src/constants";
+import { computed } from "vue";
 
 const emit = defineEmits<{
   (e: "change-status", value: VacancyDetailOut): void;
   (e: "selected"): void;
 }>();
 
-defineProps<{
+const props = defineProps<{
   vacancy: VacancyDetailOut;
 }>();
+
+const hasDescription = computed(() => !!props.vacancy.full_description);
 
 const buttons = [
   { status: VacancyStatus.INTERESTING, label: "interesting", severity: "success" },
@@ -51,7 +54,11 @@ function onCardClick(event: MouseEvent) {
             in <strong>{{ vacancy.company }}</strong>
           </span>
         </h3>
-        <span class="text-sm text-gray-500 whitespace-nowrap">{{ vacancy.date }}</span>
+        <div class="flex flex-col">
+          <span class="text-sm text-gray-500 whitespace-nowrap">{{ vacancy.date }}</span>
+          <i v-if="hasDescription" class="pi pi-check" style="color: green"></i>
+          <i v-else class="pi pi-times" style="color: red"></i>
+        </div>
       </div>
       <p class="text-sm font-medium text-gray-500 mb-4">{{ vacancy.cities }}</p>
       <p class="text-gray-700 leading-relaxed">
