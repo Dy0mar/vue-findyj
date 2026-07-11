@@ -1,9 +1,10 @@
 import type { AxiosResponse } from "axios";
 import type { Ref } from "vue";
+import { computed } from "vue";
 import type { Paginated } from "src/types/models/extra";
 import type { VacancyDetailOut, VacancyIn } from "src/types/models/vacancy/vacancy";
-import type { Pages, UseInfiniteQueryOptions, UseMutationOptions } from "src/api/query/types";
-import { vacancyClient } from "src/api/client/vacancy";
+import type { Pages, UseInfiniteQueryOptions, UseMutationOptions, UseQueryOptions } from "src/api/query/types";
+import { vacancyClient, type FetchDetailResponse } from "src/api/client/vacancy";
 import { queryClient } from "src/queryClient";
 import { DEFAULT_PAGE_SIZE } from "src/constants";
 
@@ -139,6 +140,18 @@ class VacancyQuery {
       { v_id: number; status?: VacancyIn["status"]; read?: VacancyIn["read"] },
       AxiosResponse
     >;
+  }
+
+  vacancyDetail(v_id: Ref<number | null>) {
+    return {
+      queryKey: [ROOT_QUERY_KEY, "detail", v_id],
+      enabled: computed(() => v_id.value !== null),
+      queryFn: async () => {
+        const id = v_id.value;
+        if (id === null) throw new Error("no v_id");
+        return (await this.client.fetchVacancyDetail({ params: { v_id: id } })).data;
+      },
+    } satisfies UseQueryOptions<FetchDetailResponse, readonly [typeof ROOT_QUERY_KEY, "detail", Ref<number | null>]>;
   }
 }
 
