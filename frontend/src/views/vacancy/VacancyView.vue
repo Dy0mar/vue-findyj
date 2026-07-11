@@ -42,6 +42,8 @@ async function onSelect(vacancy: VacancyDetailOut | undefined) {
   selected.value = vacancy;
   visible.value = true;
 
+  if (vacancy.full_description) return;
+
   const u = new URL(vacancy.link);
   const company = u.pathname.match(/companies\/([^/]+)\/vacancies/)?.[1];
   if (!company) {
@@ -64,6 +66,9 @@ async function onSelect(vacancy: VacancyDetailOut | undefined) {
   console.log("export items:", items);
   const match = items.find((i: { link: string }) => i.link === vacancy.link);
   console.log("matched vacancy:", match);
+  if (match?.description) {
+    selected.value = { ...selected.value, full_description: match.description };
+  }
 }
 </script>
 
