@@ -58,7 +58,13 @@ const highlightedDesc = computed(() => {
     <template v-if="selected">
       <h2 class="text-2xl font-bold text-gray-800 mb-2">{{ selected.title }}</h2>
       <p class="text-sm text-gray-500 mb-3">{{ selected.date }}</p>
-      <a :href="selected.link" target="_blank" rel="noopener noreferrer" class="inline-block mb-3 text-sm text-blue-600 hover:text-blue-800 underline">Open original &rarr;</a>
+      <a
+        :href="selected.link"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-block mb-3 text-sm text-blue-600 hover:text-blue-800 underline"
+        >Open original &rarr;</a
+      >
       <div class="text-gray-700 leading-relaxed">
         <div v-if="selected.full_description" v-html="highlightedDesc" />
         <span v-else class="text-gray-400">No description yet</span>
@@ -71,7 +77,13 @@ const highlightedDesc = computed(() => {
     <template v-if="selected">
       <h2 class="text-xl font-bold text-gray-800 mb-2">{{ selected.title }}</h2>
       <p class="text-sm text-gray-500 mb-3">{{ selected.date }}</p>
-      <a :href="selected.link" target="_blank" rel="noopener noreferrer" class="inline-block mb-3 text-sm text-blue-600 hover:text-blue-800 underline">Open original &rarr;</a>
+      <a
+        :href="selected.link"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-block mb-3 text-sm text-blue-600 hover:text-blue-800 underline"
+        >Open original &rarr;</a
+      >
       <div class="text-gray-700 leading-relaxed">
         <div v-if="selected.full_description" v-html="highlightedDesc" />
         <span v-else class="text-gray-400">No description yet</span>

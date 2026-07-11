@@ -197,13 +197,13 @@ describe("VacancyList", () => {
       ).toBe(1);
     });
 
-    it("calls request on a card click", async () => {
+    it("should not calls request on a card click when full_description is set", async () => {
       const spy = vi.spyOn(vacancyQuery.client, "patchVacancy");
       const wrapper = await render();
       const [card1] = wrapper.findAllComponents({ name: "VacancyCard" });
       await card1?.trigger("click");
       await flushPromises();
-      expect(spy).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ data: { read: true } }));
+      expect(spy).not.toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ data: { read: true } }));
     });
 
     it("should not calls request on a card click when vacancy read already", async () => {
