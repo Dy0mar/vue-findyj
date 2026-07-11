@@ -27,6 +27,11 @@ export type Vacancy = {
   salary: string;
 } & ParsedVacancy
 
+export type VacancyPageDetails = {
+  full_description: string;
+  badges: string[];
+}
+
 export type StopWord = {
   id: number;
   word: string;

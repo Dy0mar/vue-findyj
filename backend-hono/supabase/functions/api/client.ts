@@ -1,7 +1,8 @@
 import type { AppContext, Category, Vacancy } from "./types.ts";
 import type { ProductionTables } from "./database.types.ts";
-import { fetchVacancies } from "./parser.ts";
+import { fetchVacancies, extractVacancyDetails } from "./parser.ts";
 import { findWordsInString } from "./utils/search.ts";
+import { sleep } from "./utils/time.ts";
 import { VacancyStatus } from "./constants.ts";
 
 export function getClient(c: AppContext) {
@@ -85,6 +86,28 @@ export async function loadVacancies(c: AppContext, category: Category) {
 
     if (error) {
       throw error;
+    }
+  }
+
+  // vacancy - update full description and badges
+  const { data: emptyDescriptions } = await client
+    .from(Table.vacancies)
+    .select('v_id, link')
+    .eq('category_id', category.id)
+    .eq('full_description', '')
+
+  if (emptyDescriptions) {
+    for (const v of emptyDescriptions) {
+      if (!v.link) continue
+
+      const details = await extractVacancyDetails(v.link)
+      if (details) {
+        await client.from(Table.vacancies)
+          .update({ full_description: details.full_description, badges: details.badges })
+          .eq('v_id', v.v_id)
+      }
+
+      await sleep(500 + Math.random() * 1500)
     }
   }
 

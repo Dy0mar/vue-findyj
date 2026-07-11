@@ -1,6 +1,6 @@
 import { HTTPException } from 'hono/http-exception'
 import { DOMParser, Element } from "deno-dom";
-import type { ParsedVacancy } from "./types.ts";
+import type { ParsedVacancy, VacancyPageDetails } from "./types.ts";
 import { SITE_URL } from "./constants.ts";
 import { sleep } from "./utils/time.ts";
 
@@ -156,4 +156,25 @@ export async function extractJobDescription(link: string): Promise<DescriptionRe
   const salary = salaryEl ? salaryEl.textContent.trim() : null;
 
   return { description, salary };
+}
+
+export async function extractVacancyDetails(link: string): Promise<VacancyPageDetails | null> {
+  const response = await fetch(link);
+  const html = await response.text();
+
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  if (!doc) return null;
+
+  const section = doc.querySelector(".vacancy-section");
+  if (!section) return null;
+
+  const full_description = section.textContent.trim();
+
+  const badgeEls = doc.querySelectorAll("a.badge");
+  const badges: string[] = [];
+  for (const el of badgeEls) {
+    badges.push(el.textContent.trim());
+  }
+
+  return { full_description, badges };
 }
