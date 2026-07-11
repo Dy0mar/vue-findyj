@@ -17,4 +17,3 @@ export function findWordsInString(words: string[], str: string): string | null {
   }
   return null
 }
-

@@ -97,14 +97,21 @@ export async function loadVacancies(c: AppContext, category: Category) {
     .eq('full_description', '')
 
   if (emptyDescriptions) {
+    const descWords = await fetchStopWords(c, "descriptionstopword")
+
     for (const v of emptyDescriptions) {
       if (!v.link) continue
 
       const details = await extractVacancyDetails(v.link)
       if (details) {
-        await client.from(Table.vacancies)
-          .update({ full_description: details.full_description, badges: details.badges })
-          .eq('v_id', v.v_id)
+        const update: Record<string, unknown> = {
+          full_description: details.full_description,
+          badges: details.badges,
+        }
+        if (descWords.length && findWordsInString(descWords, details.full_description) !== null) {
+          update.status = VacancyStatus.BANNED
+        }
+        await client.from(Table.vacancies).update(update).eq('v_id', v.v_id)
       }
 
       await sleep(500 + Math.random() * 1500)
