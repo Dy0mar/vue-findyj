@@ -55,15 +55,6 @@ function onSelect(vacancy: VacancyDetailOut | undefined) {
     <template v-if="selected">
       <h2 class="text-2xl font-bold text-gray-800 mb-2">{{ selected.title }}</h2>
       <p class="text-sm text-gray-500 mb-3">{{ selected.date }}</p>
-      <div v-if="selected.badges?.length" class="flex flex-wrap gap-1 mb-3">
-        <span
-          v-for="badge in selected.badges"
-          :key="badge"
-          class="inline-block text-xs font-semibold px-2 py-0.5 rounded bg-blue-100 text-blue-800"
-        >
-          {{ badge }}
-        </span>
-      </div>
       <div class="text-gray-700 leading-relaxed whitespace-pre-line">
         {{ selected.full_description || "No description yet" }}
       </div>
@@ -75,15 +66,6 @@ function onSelect(vacancy: VacancyDetailOut | undefined) {
     <template v-if="selected">
       <h2 class="text-xl font-bold text-gray-800 mb-2">{{ selected.title }}</h2>
       <p class="text-sm text-gray-500 mb-3">{{ selected.date }}</p>
-      <div v-if="selected.badges?.length" class="flex flex-wrap gap-1 mb-3">
-        <span
-          v-for="badge in selected.badges"
-          :key="badge"
-          class="inline-block text-xs font-semibold px-2 py-0.5 rounded bg-blue-100 text-blue-800"
-        >
-          {{ badge }}
-        </span>
-      </div>
       <div class="text-gray-700 leading-relaxed whitespace-pre-line">
         {{ selected.full_description || "No description yet" }}
       </div>

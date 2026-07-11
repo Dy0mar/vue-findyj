@@ -58,13 +58,6 @@ function extractJobInfo(li: Element): ParsedVacancy {
     ? descEl.textContent.replace(/\s+/g, " ").trim()
     : "";
 
-  // Badges
-  const badgeEls = li.querySelectorAll("div.date a.badge");
-  const badges: string[] = [];
-  for (const el of badgeEls) {
-    badges.push(el.textContent.trim());
-  }
-
   return {
     v_id: jobId,
     link,
@@ -73,7 +66,6 @@ function extractJobInfo(li: Element): ParsedVacancy {
     company,
     cities,
     description,
-    badges,
   };
 }
 

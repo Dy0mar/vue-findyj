@@ -16,7 +16,6 @@ export type ParsedVacancy = {
   company: string;
   cities: string;
   description: string;
-  badges: string[];
 }
 
 export type Vacancy = {

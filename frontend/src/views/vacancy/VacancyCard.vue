@@ -61,15 +61,6 @@ function onCardClick(event: MouseEvent) {
         </div>
       </div>
       <p class="text-sm font-medium text-gray-500 mb-2">{{ vacancy.cities }}</p>
-      <div v-if="vacancy.badges?.length" class="flex flex-wrap gap-1 mb-3">
-        <span
-          v-for="badge in vacancy.badges"
-          :key="badge"
-          class="inline-block text-xs font-semibold px-2 py-0.5 rounded bg-blue-100 text-blue-800"
-        >
-          {{ badge }}
-        </span>
-      </div>
       <p class="text-gray-700 leading-relaxed">
         {{ vacancy.description }}
       </p>
