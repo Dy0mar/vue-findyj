@@ -4,7 +4,7 @@ import type { ParsedVacancy, VacancyPageDetails } from "./types.ts";
 import { SITE_URL } from "./constants.ts";
 import { sleep } from "./utils/time.ts";
 
-const BASE_URL = SITE_URL
+export const BASE_URL = SITE_URL
 
 const request_url = (category: string) => {
   const ajax = "xhr-load/?category=" + category
@@ -12,12 +12,23 @@ const request_url = (category: string) => {
 }
 
 
-function makeHeaders(referer?: string) {
+export function makeHeaders(referer?: string) {
   const headers = {
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36",
     "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
   }
   return referer ? { ...headers, Referer: referer } : headers;
+}
+
+async function createSession(): Promise<{ cookie: string; csrf: string }> {
+  const baseResp = await fetch(BASE_URL, {
+    headers: makeHeaders(BASE_URL),
+    redirect: "manual",
+  })
+  const cookie = baseResp.headers.get("set-cookie") || ""
+  const csrfMatch = cookie.match(/csrftoken=([^;]+)/)
+  const csrf = csrfMatch?.[1] ?? ""
+  return { cookie, csrf }
 }
 
 
@@ -47,6 +58,13 @@ function extractJobInfo(li: Element): ParsedVacancy {
     ? descEl.textContent.replace(/\s+/g, " ").trim()
     : "";
 
+  // Badges
+  const badgeEls = li.querySelectorAll("div.date a.badge");
+  const badges: string[] = [];
+  for (const el of badgeEls) {
+    badges.push(el.textContent.trim());
+  }
+
   return {
     v_id: jobId,
     link,
@@ -55,21 +73,19 @@ function extractJobInfo(li: Element): ParsedVacancy {
     company,
     cities,
     description,
+    badges,
   };
 }
 
+type VacanciesResponse = {
+  vacancies: ParsedVacancy[];
+  cookie: string;
+  csrf: string;
+}
 
-export async function fetchVacancies(category: string): Promise<ParsedVacancy[]> {
+export async function fetchVacancies(category: string): Promise<VacanciesResponse> {
   const headers = makeHeaders(BASE_URL)
-
-  const baseResp = await fetch(BASE_URL, {
-    headers,
-    redirect: "manual",
-  });
-
-  const cookie = baseResp.headers.get("set-cookie") || "";
-  const csrfMatch = cookie.match(/csrftoken=([^;]+)/);
-  const csrf = csrfMatch?.[1] ?? "";
+  const { cookie, csrf } = await createSession();
 
   let count = 0;
   const vacancies: ParsedVacancy[] = [];
@@ -125,7 +141,7 @@ export async function fetchVacancies(category: string): Promise<ParsedVacancy[]>
 
     await sleep();
   }
-  return vacancies
+  return { vacancies, cookie, csrf }
 }
 
 type DescriptionResponseDict = {
@@ -158,25 +174,4 @@ export async function extractJobDescription(link: string): Promise<DescriptionRe
   const salary = salaryEl ? salaryEl.textContent.trim() : null;
 
   return { description, salary };
-}
-
-export async function extractVacancyDetails(link: string): Promise<VacancyPageDetails | null> {
-  const response = await fetch(link);
-  const html = await response.text();
-
-  const doc = new DOMParser().parseFromString(html, "text/html");
-  if (!doc) return null;
-
-  const section = doc.querySelector(".vacancy-section");
-  if (!section) return null;
-
-  const full_description = section.textContent.trim();
-
-  const badgeEls = doc.querySelectorAll("a.badge");
-  const badges: string[] = [];
-  for (const el of badgeEls) {
-    badges.push(el.textContent.trim());
-  }
-
-  return { full_description, badges };
 }

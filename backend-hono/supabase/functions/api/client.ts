@@ -1,8 +1,7 @@
 import type { AppContext, Category, Vacancy } from "./types.ts";
 import type { ProductionTables } from "./database.types.ts";
-import { fetchVacancies, extractVacancyDetails } from "./parser.ts";
+import { fetchVacancies } from "./parser.ts";
 import { findWordsInString } from "./utils/search.ts";
-import { sleep } from "./utils/time.ts";
 import { VacancyStatus } from "./constants.ts";
 
 export function getClient(c: AppContext) {
@@ -49,7 +48,7 @@ export async function loadVacancies(c: AppContext, category: Category) {
 
   const client = getClient(c)
   const ids_ = catItems?.map(({ v_id }) => v_id) ?? []
-  const allVacancies = await fetchVacancies(category.name)
+  const { vacancies: allVacancies, cookie, csrf } = await fetchVacancies(category.name)
   const words = await fetchStopWords(c, "titlestopword")
 
   const vacancies_to_create = allVacancies
@@ -90,7 +89,7 @@ export async function loadVacancies(c: AppContext, category: Category) {
   }
 
   // vacancy - update full description and badges
-  const { data: emptyDescriptions } = await client
+  /*const { data: emptyDescriptions } = await client
     .from(Table.vacancies)
     .select('v_id, link')
     .eq('category_id', category.id)
@@ -106,25 +105,24 @@ export async function loadVacancies(c: AppContext, category: Category) {
       if (!v.link) continue
       if (updated >= LIMIT) break
 
-      const details = await extractVacancyDetails(v.link)
+      const details = await extractVacancyDetails(v.link, cookie, csrf)
       if (details) {
         const update: Record<string, unknown> = {
           full_description: details.full_description,
-          badges: details.badges,
         }
         // if (descWords.length && findWordsInString(descWords, details.full_description) !== null) {
         //   update.status = VacancyStatus.BANNED
         // }
         await client.from(Table.vacancies).update(update).eq('v_id', v.v_id)
-        updated++
         console.log(`[${category.name}] updated ${updated}/${Math.min(total, LIMIT)} (v_id=${v.v_id})`)
       } else {
         console.log(`[${category.name}] skipped v_id=${v.v_id} (no details)`)
       }
+      updated++
 
       await sleep(500 + Math.random() * 1500)
     }
-  }
+  }*/
 
   return {
     created: vacancies_to_create.length,

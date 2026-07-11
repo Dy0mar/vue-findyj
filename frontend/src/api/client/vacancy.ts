@@ -11,12 +11,6 @@ type IDParams = {
   id: number;
 };
 
-type FetchDetailResponse = {
-  success: boolean;
-  full_description: string;
-  badges: string[];
-};
-
 class Path extends BasePath<URLParams | IDParams> {
   basePath = "/vacancies";
 
@@ -41,12 +35,6 @@ class VacancyClient extends BaseAPIClient {
     const url = this.path.detail(ctx.params);
     return this.client.patch(url, ctx.data);
   }
-
-  fetchVacancyDetail(ctx: { params: URLParams }) {
-    const url = this.path.detail(ctx.params);
-    return this.client.get<FetchDetailResponse>(url);
-  }
 }
 
-export { type FetchDetailResponse };
 export const vacancyClient = new VacancyClient();

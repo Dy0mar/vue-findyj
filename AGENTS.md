@@ -66,7 +66,7 @@ vue-findyj/
 │   └── supabase/functions/api/  # Hono Edge Function
 │       ├── index.ts             # Route definitions
 │       ├── client.ts            # DB helpers (CRUD, loadVacancies)
-│       ├── parser.ts            # Скрапінг DOU (fetchVacancies, extractJobDescription)
+│       ├── parser.ts            # Скрапінг (fetchVacancies, extractJobDescription)
 │       ├── middleware.ts        # Supabase auth middleware
 │       ├── constants.ts         # VacancyStatus, SITE_URL
 │       ├── types.ts             # Category, ParsedVacancy, Vacancy, StopWord
@@ -87,10 +87,10 @@ vue-findyj/
 | Column | Type | Notes |
 |---|---|---|
 | id | int8 (PK) | Auto |
-| v_id | int8 | External DOU vacancy ID |
+| v_id | int8 | External vacancy ID |
 | title | text | |
 | description | text | |
-| link | text | URL на DOU |
+| link | text | URL |
 | date | text | |
 | company | text | |
 | salary | text | |
@@ -111,7 +111,7 @@ vue-findyj/
 | Method | Path | Auth | Description |
 |---|---|---|---|
 | GET | /categories | Yes | List categories |
-| GET | /crawler/run-parse?category= | Yes | Scrape DOU vacancies |
+| GET | /crawler/run-parse?category= | Yes | Scrape vacancies |
 | GET | /vacancies?status=&category=&search=&offset=&limit= | Yes | List vacancies (paginated) |
 | PATCH | /vacancies/:v_id | Yes | Update vacancy (status, read) |
 | GET | /stop-words/title | Yes | List title stop words |
@@ -182,5 +182,5 @@ cd frontend && pnpm lint:oxlint && pnpm lint:eslint && pnpm type-check && pnpm t
 1. **Single Hono Edge Function** — все API endpoints в одному файлі `index.ts`
 2. **Test mode** — `TEST_MODE` env var перемикає на `test_` таблиці
 3. **proxy-based Table** — `Table.vacancies` автоматично додає `test_` префікс для тестів
-4. **Polite scraping** — 500ms `sleep()` між запитами до DOU
+4. **Polite scraping** — 500ms `sleep()` між запитами
 5. **No reactive mobile check** — `isMobile()` викликається один раз при завантаженні (навмисно)

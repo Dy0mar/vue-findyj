@@ -1,28 +1,17 @@
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, ref } from "vue";
 import { useRoute } from "vue-router";
-import { useQuery } from "@tanstack/vue-query";
 import Drawer from "primevue/drawer";
 import type { VacancyDetailOut } from "src/types/models/vacancy/vacancy";
 import { isMobile } from "src/utils/adaptive";
 import { VacancyStatus } from "src/constants";
-import { vacancyQuery } from "src/api/query/vacancy";
 import VacancyList from "src/views/vacancy/VacancyList.vue";
 
 const route = useRoute();
 const selected = ref<VacancyDetailOut>();
 const visible = ref(false);
-const selectedVId = ref<number | null>(null);
 // yes, I know it's not reactive, but I don't care.
 const isMobile_ = isMobile();
-
-const { data: detailData, isFetching } = useQuery(vacancyQuery.vacancyDetail(selectedVId));
-
-watch(detailData, (data) => {
-  if (data?.success && selected.value) {
-    selected.value = { ...selected.value, full_description: data.full_description, badges: data.badges };
-  }
-});
 
 const status = computed(() => {
   const { status } = route.query;
@@ -51,8 +40,8 @@ const search = computed<string | undefined>(() => {
 function onSelect(vacancy: VacancyDetailOut | undefined) {
   if (vacancy) {
     selected.value = vacancy;
-    selectedVId.value = vacancy.v_id;
     visible.value = true;
+    window.open(vacancy.link, "_blank");
   }
 }
 </script>
@@ -76,8 +65,7 @@ function onSelect(vacancy: VacancyDetailOut | undefined) {
         </span>
       </div>
       <div class="text-gray-700 leading-relaxed whitespace-pre-line">
-        <span v-if="isFetching" class="text-gray-400 italic">Loading...</span>
-        <span v-else>{{ selected.full_description || "No description yet" }}</span>
+        {{ selected.full_description || "No description yet" }}
       </div>
     </template>
     <div v-else class="flex items-center justify-center h-full text-gray-400 text-lg">Select a vacancy</div>
@@ -97,8 +85,7 @@ function onSelect(vacancy: VacancyDetailOut | undefined) {
         </span>
       </div>
       <div class="text-gray-700 leading-relaxed whitespace-pre-line">
-        <span v-if="isFetching" class="text-gray-400 italic">Loading...</span>
-        <span v-else>{{ selected.full_description || "No description yet" }}</span>
+        {{ selected.full_description || "No description yet" }}
       </div>
     </template>
   </Drawer>

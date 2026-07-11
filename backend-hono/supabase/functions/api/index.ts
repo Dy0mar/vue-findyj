@@ -84,8 +84,8 @@ api.get('/vacancies', async (c) => {
   }
   query = query
     .range(pageOffset, pageOffset + pageLimit - 1)
-    .order('full_description', { ascending: true })
     .order('read', { ascending: true })
+    .order('id', { ascending: true })
 
   const { data, error, count } = await query
   if (error) {
