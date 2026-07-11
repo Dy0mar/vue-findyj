@@ -1,28 +1,17 @@
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, ref } from "vue";
 import { useRoute } from "vue-router";
-import { useQuery } from "@tanstack/vue-query";
 import Drawer from "primevue/drawer";
 import type { VacancyDetailOut } from "src/types/models/vacancy/vacancy";
 import { isMobile } from "src/utils/adaptive";
 import { VacancyStatus } from "src/constants";
-import { vacancyQuery } from "src/api/query/vacancy";
 import VacancyList from "src/views/vacancy/VacancyList.vue";
 
 const route = useRoute();
 const selected = ref<VacancyDetailOut>();
 const visible = ref(false);
-const selectedVId = ref<number | null>(null);
 // yes, I know it's not reactive, but I don't care.
 const isMobile_ = isMobile();
-
-const { data: detailData, isFetching } = useQuery(vacancyQuery.vacancyDetail(selectedVId));
-
-watch(detailData, (data) => {
-  if (data?.full_description && selected.value) {
-    selected.value = { ...selected.value, full_description: data.full_description };
-  }
-});
 
 const status = computed(() => {
   const { status } = route.query;
@@ -48,12 +37,33 @@ const search = computed<string | undefined>(() => {
   return String(route.query.search);
 });
 
-function onSelect(vacancy: VacancyDetailOut | undefined) {
-  if (vacancy) {
-    selected.value = vacancy;
-    selectedVId.value = vacancy.v_id;
-    visible.value = true;
+async function onSelect(vacancy: VacancyDetailOut | undefined) {
+  if (!vacancy) return;
+  selected.value = vacancy;
+  visible.value = true;
+
+  const u = new URL(vacancy.link);
+  const company = u.pathname.match(/companies\/([^/]+)\/vacancies/)?.[1];
+  if (!company) {
+    console.warn("Cannot parse company from link", vacancy.link);
+    return;
   }
+  const exportUrl = `${u.origin}/companies/${company}/vacancies/export/`;
+  const resp = await fetch(exportUrl, {
+    headers: {
+      "Accept": "*/*",
+      "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+      "Referer": `${u.origin}/`,
+    },
+  });
+  if (!resp.ok) {
+    console.warn("export fetch failed", resp.status);
+    return;
+  }
+  const items = await resp.json();
+  console.log("export items:", items);
+  const match = items.find((i: { link: string }) => i.link === vacancy.link);
+  console.log("matched vacancy:", match);
 }
 </script>
 
@@ -67,8 +77,7 @@ function onSelect(vacancy: VacancyDetailOut | undefined) {
       <h2 class="text-2xl font-bold text-gray-800 mb-2">{{ selected.title }}</h2>
       <p class="text-sm text-gray-500 mb-3">{{ selected.date }}</p>
       <div class="text-gray-700 leading-relaxed whitespace-pre-line">
-        <span v-if="isFetching" class="text-gray-400 italic">Loading...</span>
-        <span v-else>{{ selected.full_description || "No description yet" }}</span>
+        <span>{{ selected.full_description || "No description yet" }}</span>
       </div>
     </template>
     <div v-else class="flex items-center justify-center h-full text-gray-400 text-lg">Select a vacancy</div>
@@ -79,8 +88,7 @@ function onSelect(vacancy: VacancyDetailOut | undefined) {
       <h2 class="text-xl font-bold text-gray-800 mb-2">{{ selected.title }}</h2>
       <p class="text-sm text-gray-500 mb-3">{{ selected.date }}</p>
       <div class="text-gray-700 leading-relaxed whitespace-pre-line">
-        <span v-if="isFetching" class="text-gray-400 italic">Loading...</span>
-        <span v-else>{{ selected.full_description || "No description yet" }}</span>
+        <span>{{ selected.full_description || "No description yet" }}</span>
       </div>
     </template>
   </Drawer>
