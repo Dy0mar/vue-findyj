@@ -167,3 +167,24 @@ export async function extractJobDescription(link: string): Promise<DescriptionRe
 
   return { description, salary };
 }
+
+export type ExportItem = {
+  title: string;
+  link: string;
+  description: string;
+  salary: string;
+  location: string;
+  category: string;
+  date: string;
+}
+
+export async function fetchCompanyExport(company: string): Promise<ExportItem[] | null> {
+  const url = `${SITE_URL}companies/${company}/vacancies/export/`
+  const resp = await fetch(url, {
+    headers: {
+      "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+    },
+  })
+  if (!resp.ok) return null
+  return resp.json()
+}

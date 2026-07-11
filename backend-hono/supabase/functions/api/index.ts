@@ -13,7 +13,7 @@ import {
 import { loadVacancies } from "./client.ts";
 import { sleep } from "./utils/time.ts";
 import { findWordsInString } from "./utils/search.ts";
-import { extractJobDescription } from "./parser.ts";
+import { extractJobDescription, fetchCompanyExport } from "./parser.ts";
 import { supabase } from "./middleware.ts";
 
 export const api = new Hono<{ Variables: AppVariables }>()
@@ -113,6 +113,47 @@ api.patch('/vacancies/:v_id', async (c) => {
     .eq("v_id", v_id)
 
   return c.json(data, 200)
+})
+
+/** Vacancy detail */
+api.get('/vacancies/:v_id', async (c) => {
+  const v_id = parseInt(c.req.param('v_id'))
+
+  const { data: vacancy } = await getClient(c)
+    .from(Table.vacancies)
+    .select('v_id, link, full_description')
+    .eq('v_id', v_id)
+    .single()
+
+  if (!vacancy?.link) {
+    return c.json({ error: 'Vacancy not found' }, 404)
+  }
+
+  if (vacancy.full_description) {
+    return c.json({ success: true, full_description: vacancy.full_description, badges: [] })
+  }
+
+  const company = new URL(vacancy.link).pathname.match(/companies\/([^/]+)\/vacancies/)?.[1]
+  if (!company) {
+    return c.json({ error: 'Cannot parse company from link' }, 400)
+  }
+
+  const items = await fetchCompanyExport(company)
+  if (!items) {
+    return c.json({ error: 'Failed to fetch company export from DOU' }, 502)
+  }
+
+  const match = items.find(i => i.link === vacancy.link)
+  if (!match) {
+    return c.json({ error: 'Vacancy not found in company export' }, 404)
+  }
+
+  await getClient(c)
+    .from(Table.vacancies)
+    .update({ full_description: match.description })
+    .eq('v_id', v_id)
+
+  return c.json({ success: true, full_description: match.description, badges: [] })
 })
 
 /** ------------ STOP WORDS ------------ */

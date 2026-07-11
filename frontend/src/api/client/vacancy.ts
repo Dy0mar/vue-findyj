@@ -35,6 +35,11 @@ class VacancyClient extends BaseAPIClient {
     const url = this.path.detail(ctx.params);
     return this.client.patch(url, ctx.data);
   }
+
+  fetchVacancyDetail(ctx: { params: URLParams }) {
+    const url = this.path.detail(ctx.params);
+    return this.client.get<VacancyDetailOut>(url);
+  }
 }
 
 export const vacancyClient = new VacancyClient();
