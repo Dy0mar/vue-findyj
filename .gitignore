@@ -39,4 +39,4 @@ tmp
 
 backend-hono/supabase/.branches
 backend-hono/supabase/.temp
-supabase
+/supabase

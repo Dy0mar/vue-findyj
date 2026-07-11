@@ -8,6 +8,7 @@ export type VacancyDetailOut = {
   v_id: number;
   title: string;
   description: string;
+  full_description: string | null;
   link: string;
   date: string | null;
   company: string | null;
@@ -18,6 +19,7 @@ export type VacancyDetailOut = {
   status_display: string;
   read: boolean;
   category: Category["name"];
+  badges: string[];
 };
 
 export type VacancyIn = Partial<Omit<VacancyDetailOut, "id">>;

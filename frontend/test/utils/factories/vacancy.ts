@@ -7,9 +7,11 @@ export class VacancyDetailOutFactory extends Factory<VacancyDetailOut> {
   generate() {
     return {
       id: faker.number.int(),
+      badges: [faker.lorem.word()],
       v_id: faker.number.int(),
       title: faker.person.jobTitle(),
       description: faker.lorem.paragraphs(3),
+      full_description: faker.lorem.paragraphs(3),
       link: faker.internet.url(),
       date: faker.date.recent().toISOString(),
       company: faker.company.name(),

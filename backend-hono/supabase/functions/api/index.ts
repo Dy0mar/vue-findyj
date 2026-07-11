@@ -42,15 +42,16 @@ api.get('/categories', async (c) => {
 
 /** Add vacancies */
 api.get('/crawler/run-parse', async (c) => {
-  const { category } = c.req.query()
+  const { data: allCategories } = await getClient(c).from(Table.categories).select<string, Category>("*")
 
-  const { data: categoryObj } = await fetchCategoryByName(c, category)
-  if (!categoryObj) {
-    throw new HTTPException(404, { message: `category: ${category} not found` });
+  const totals = { created: 0, removed: 0 }
+  for (const cat of allCategories ?? []) {
+    const result = await loadVacancies(c, cat)
+    totals.created += result.created
+    totals.removed += result.removed
   }
 
-  const result = await loadVacancies(c, categoryObj)
-  return c.json(result, 200)
+  return c.json(totals, 200)
 })
 
 

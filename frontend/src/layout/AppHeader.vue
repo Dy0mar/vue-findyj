@@ -26,9 +26,6 @@ const categories = computed<string[]>(() => {
 });
 
 const { loading, requestAsync } = useRequest(() => {
-  if (route.query.category) {
-    return crawlerClient.runParse({ data: { category: String(route.query.category) } });
-  }
   return crawlerClient.runParse();
 });
 

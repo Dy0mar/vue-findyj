@@ -111,12 +111,14 @@ export type Database = {
       }
       test_vacancies: {
         Row: {
+          badges: string[] | null
           category_id: number | null
           cities: string | null
           company: string | null
           created_at: string
           date: string | null
           description: string | null
+          full_description: string | null
           id: number
           link: string | null
           read: boolean
@@ -126,12 +128,14 @@ export type Database = {
           v_id: number
         }
         Insert: {
+          badges?: string[] | null
           category_id?: number | null
           cities?: string | null
           company?: string | null
           created_at?: string
           date?: string | null
           description?: string | null
+          full_description?: string | null
           id?: number
           link?: string | null
           read?: boolean
@@ -141,12 +145,14 @@ export type Database = {
           v_id: number
         }
         Update: {
+          badges?: string[] | null
           category_id?: number | null
           cities?: string | null
           company?: string | null
           created_at?: string
           date?: string | null
           description?: string | null
+          full_description?: string | null
           id?: number
           link?: string | null
           read?: boolean
@@ -182,12 +188,14 @@ export type Database = {
       }
       vacancies: {
         Row: {
+          badges: string[] | null
           category_id: number | null
           cities: string | null
           company: string | null
           created_at: string
           date: string | null
           description: string | null
+          full_description: string | null
           id: number
           link: string | null
           read: boolean
@@ -197,12 +205,14 @@ export type Database = {
           v_id: number
         }
         Insert: {
+          badges?: string[] | null
           category_id?: number | null
           cities?: string | null
           company?: string | null
           created_at?: string
           date?: string | null
           description?: string | null
+          full_description?: string | null
           id?: number
           link?: string | null
           read?: boolean
@@ -212,12 +222,14 @@ export type Database = {
           v_id: number
         }
         Update: {
+          badges?: string[] | null
           category_id?: number | null
           cities?: string | null
           company?: string | null
           created_at?: string
           date?: string | null
           description?: string | null
+          full_description?: string | null
           id?: number
           link?: string | null
           read?: boolean
