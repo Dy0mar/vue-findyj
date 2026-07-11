@@ -5,6 +5,7 @@ import Drawer from "primevue/drawer";
 import type { VacancyDetailOut } from "src/types/models/vacancy/vacancy";
 import { isMobile } from "src/utils/adaptive";
 import { VacancyStatus } from "src/constants";
+import { highlightKeywords } from "src/utils/highlight";
 import VacancyList from "src/views/vacancy/VacancyList.vue";
 
 const route = useRoute();
@@ -42,6 +43,10 @@ function onSelect(vacancy: VacancyDetailOut | undefined) {
   selected.value = vacancy;
   visible.value = true;
 }
+
+const highlightedDesc = computed(() => {
+  return selected.value?.full_description ? highlightKeywords(selected.value.full_description) : "";
+});
 </script>
 
 <template>
@@ -54,7 +59,7 @@ function onSelect(vacancy: VacancyDetailOut | undefined) {
       <h2 class="text-2xl font-bold text-gray-800 mb-2">{{ selected.title }}</h2>
       <p class="text-sm text-gray-500 mb-3">{{ selected.date }}</p>
       <div class="text-gray-700 leading-relaxed">
-        <div v-if="selected.full_description" v-html="selected.full_description" />
+        <div v-if="selected.full_description" v-html="highlightedDesc" />
         <span v-else class="text-gray-400">No description yet</span>
       </div>
     </template>
@@ -66,7 +71,7 @@ function onSelect(vacancy: VacancyDetailOut | undefined) {
       <h2 class="text-xl font-bold text-gray-800 mb-2">{{ selected.title }}</h2>
       <p class="text-sm text-gray-500 mb-3">{{ selected.date }}</p>
       <div class="text-gray-700 leading-relaxed">
-        <div v-if="selected.full_description" v-html="selected.full_description" />
+        <div v-if="selected.full_description" v-html="highlightedDesc" />
         <span v-else class="text-gray-400">No description yet</span>
       </div>
     </template>
