@@ -58,10 +58,43 @@ async function changeStatus({ v_id, status }: VacancyDetailOut) {
  */
 async function onCardSelect(vacancy: VacancyDetailOut) {
   selected.value = vacancy;
-  emit("selected", vacancy);
-  if (!vacancy.read) {
-    await patchVacancy({ v_id: vacancy.v_id, read: true });
+
+  if (vacancy.full_description) {
+    emit("selected", vacancy);
+    return;
   }
+
+  const u = new URL(vacancy.link);
+  const company = u.pathname.match(/companies\/([^/]+)\/vacancies/)?.[1];
+  if (!company) {
+    emit("selected", vacancy);
+    return;
+  }
+
+  const resp = await fetch(`${u.origin}/companies/${company}/vacancies/export/`, {
+    headers: {
+      Accept: "*/*",
+      "User-Agent":
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+      Referer: `${u.origin}/`,
+    },
+  });
+
+  if (!resp.ok) {
+    emit("selected", vacancy);
+    return;
+  }
+
+  const items = await resp.json();
+  const match = items.find((i: { link: string }) => i.link === vacancy.link);
+  if (!match?.description) {
+    emit("selected", vacancy);
+    return;
+  }
+
+  await patchVacancy({ v_id: vacancy.v_id, read: true, full_description: match.description });
+
+  emit("selected", { ...vacancy, read: true, full_description: match.description });
 }
 
 const count = computed(() => (data.value && data.value.pages[0] ? data.value.pages[0].count : 0));

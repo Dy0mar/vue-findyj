@@ -52,7 +52,7 @@ class VacancyQuery {
       mutationFn: async ({ v_id, ...rest }) => {
         return await this.client.patchVacancy({ params: { v_id }, data: rest });
       },
-      onMutate: async ({ v_id, status, read }) => {
+      onMutate: async ({ v_id, status, read, full_description }) => {
         await queryClient.cancelQueries({ queryKey: [ROOT_QUERY_KEY], exact: false });
 
         // mark read all cached vacancy in caches
@@ -68,7 +68,11 @@ class VacancyQuery {
                 ...oldData,
                 pages: oldData.pages.map((page) => ({
                   ...page,
-                  items: page.items.map((item) => (item.v_id === v_id ? { ...item, read } : item)),
+                  items: page.items.map((item) =>
+                    item.v_id === v_id
+                      ? { ...item, read, ...(full_description !== undefined ? { full_description } : {}) }
+                      : item,
+                  ),
                 })),
               };
             },
@@ -137,7 +141,12 @@ class VacancyQuery {
         }
       },
     } satisfies UseMutationOptions<
-      { v_id: number; status?: VacancyIn["status"]; read?: VacancyIn["read"] },
+      {
+        v_id: number;
+        status?: VacancyIn["status"];
+        read?: VacancyIn["read"];
+        full_description?: VacancyIn["full_description"];
+      },
       AxiosResponse
     >;
   }
