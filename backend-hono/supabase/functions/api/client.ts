@@ -98,9 +98,13 @@ export async function loadVacancies(c: AppContext, category: Category) {
 
   if (emptyDescriptions) {
     const descWords = await fetchStopWords(c, "descriptionstopword")
+    const total = emptyDescriptions.length
+    let updated = 0
+    const LIMIT = 5
 
     for (const v of emptyDescriptions) {
       if (!v.link) continue
+      if (updated >= LIMIT) break
 
       const details = await extractVacancyDetails(v.link)
       if (details) {
@@ -112,6 +116,10 @@ export async function loadVacancies(c: AppContext, category: Category) {
           update.status = VacancyStatus.BANNED
         }
         await client.from(Table.vacancies).update(update).eq('v_id', v.v_id)
+        updated++
+        console.log(`[${category.name}] updated ${updated}/${Math.min(total, LIMIT)} (v_id=${v.v_id})`)
+      } else {
+        console.log(`[${category.name}] skipped v_id=${v.v_id} (no details)`)
       }
 
       await sleep(500 + Math.random() * 1500)

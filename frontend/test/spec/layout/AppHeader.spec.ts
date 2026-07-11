@@ -149,6 +149,14 @@ describe("AppHeader", () => {
   });
 
   describe("parse", () => {
+    it("should call request with params", async () => {
+      const resp = new AxiosResponseFactory({ data: { created: 1, removed: 0 } }).create();
+      const mockRunParse = vi.spyOn(crawlerClient, "runParse").mockResolvedValueOnce(resp);
+      const wrapper = await render();
+      await getByAriaLabel(wrapper, "Fetch new").trigger("click");
+      expect(mockRunParse).toHaveBeenCalledExactlyOnceWith({ data: { category: categories[0]!.name } });
+    });
+
     it("should call request without params", async () => {
       const resp = new AxiosResponseFactory({ data: { created: 1, removed: 0 } }).create();
       const mockRunParse = vi.spyOn(crawlerClient, "runParse").mockResolvedValueOnce(resp);

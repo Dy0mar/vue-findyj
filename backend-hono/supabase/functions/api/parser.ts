@@ -117,6 +117,8 @@ export async function fetchVacancies(category: string): Promise<ParsedVacancy[]>
       vacancies.push(extractJobInfo(el));
     }
 
+    console.log(`[${category}] fetched batch ${i}, count=${count}, items=${items.length}`)
+
     if (json.last) {
       break;
     }

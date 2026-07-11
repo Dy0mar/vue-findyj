@@ -48,5 +48,5 @@ deno lint --config ./api/deno.json
 To deploy the function, run the following command:
 
 ```bash
-npx supabase functions deploy api
+npx supabase functions deploy api --import-map supabase/functions/import_map.json
 ```

@@ -42,16 +42,16 @@ api.get('/categories', async (c) => {
 
 /** Add vacancies */
 api.get('/crawler/run-parse', async (c) => {
-  const { data: allCategories } = await getClient(c).from(Table.categories).select<string, Category>("*")
+  const { category } = c.req.query()
+  console.log("run parse [category]", category)
 
-  const totals = { created: 0, removed: 0 }
-  for (const cat of allCategories ?? []) {
-    const result = await loadVacancies(c, cat)
-    totals.created += result.created
-    totals.removed += result.removed
+  const { data: categoryObj } = await fetchCategoryByName(c, category)
+  if (!categoryObj) {
+    throw new HTTPException(404, { message: `category: ${category} not found` });
   }
 
-  return c.json(totals, 200)
+  const result = await loadVacancies(c, categoryObj)
+  return c.json(result, 200)
 })
 
 
@@ -82,7 +82,10 @@ api.get('/vacancies', async (c) => {
   if (search) {
     query = query.ilike('title', `%${search}%`)
   }
-  query = query.range(pageOffset, pageOffset + pageLimit - 1).order('read', { ascending: true })
+  query = query
+    .range(pageOffset, pageOffset + pageLimit - 1)
+    .order('full_description', { ascending: true })
+    .order('read', { ascending: true })
 
   const { data, error, count } = await query
   if (error) {
