@@ -37,13 +37,16 @@ describe("VacancyView", () => {
     expect(wrapper.findComponent({ name: "VacancyList" }).props("search")).toBe("foo");
   });
 
-  it("should pass correct src prop to iframe", async () => {
+  it("should set selected vacancy on select", async () => {
     const router = getRouter();
     await router.setQuery({ category: "Python" });
     const wrapper = render();
-    wrapper.findComponent({ name: "VacancyList" }).vm.$emit("selected", { link: "https://foo.bar" });
+    wrapper
+      .findComponent({ name: "VacancyList" })
+      .vm.$emit("selected", { v_id: 1, link: "https://foo.bar", title: "Test Job", badges: [] });
     await wrapper.vm.$nextTick();
-    expect(wrapper.find("iframe").attributes("src")).toBe("https://foo.bar");
+    // @ts-expect-error private property
+    expect(wrapper.vm.selected?.title).toBe("Test Job");
   });
 
   it("should pass correct status to the list component", async () => {
@@ -81,14 +84,18 @@ describe("VacancyView", () => {
       expect(wrapper.vm.visible).toBe(true);
     });
 
-    it("sidebar should render iframe", async () => {
+    it("sidebar should show vacancy title after select", async () => {
       Object.defineProperty(window, "innerWidth", { writable: true, value: 500 });
       const router = getRouter();
       await router.setQuery({ category: "Python" });
       const wrapper = render();
-      await wrapper.findComponent({ name: "VacancyList" }).vm.$emit("selected", { link: "https://foo.bar" });
 
-      expect(getByRole(wrapper, "dialog").find("iframe").exists()).toBe(true);
+      wrapper
+        .findComponent({ name: "VacancyList" })
+        .vm.$emit("selected", { v_id: 1, link: "https://foo.bar", title: "Test Job", badges: [] });
+      await wrapper.vm.$nextTick();
+
+      expect(getByRole(wrapper, "dialog").text()).toContain("Test Job");
     });
   });
 });

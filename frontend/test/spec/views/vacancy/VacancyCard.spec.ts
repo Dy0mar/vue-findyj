@@ -34,7 +34,17 @@ describe("VacancyCard", () => {
 
   it("should has date", () => {
     const wrapper = render();
-    expect(wrapper.find("h3 ~ span").text()).toContain(vacancy.date);
+    expect(wrapper.find(".flex-col span").text()).toContain(vacancy.date);
+  });
+
+  it("should has full description marker", () => {
+    const wrapper = render();
+    expect(wrapper.find(".pi-check").exists()).toBe(true);
+  });
+
+  it("should not has full description marker", () => {
+    const wrapper = render({ props: { vacancy: { ...vacancy, full_description: "" } } });
+    expect(wrapper.find(".pi-times").exists()).toBe(true);
   });
 
   it("should has cities", () => {
