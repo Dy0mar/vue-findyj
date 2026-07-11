@@ -97,7 +97,7 @@ export async function loadVacancies(c: AppContext, category: Category) {
     .eq('full_description', '')
 
   if (emptyDescriptions) {
-    const descWords = await fetchStopWords(c, "descriptionstopword")
+    // const descWords = await fetchStopWords(c, "descriptionstopword")
     const total = emptyDescriptions.length
     let updated = 0
     const LIMIT = 5
@@ -112,9 +112,9 @@ export async function loadVacancies(c: AppContext, category: Category) {
           full_description: details.full_description,
           badges: details.badges,
         }
-        if (descWords.length && findWordsInString(descWords, details.full_description) !== null) {
-          update.status = VacancyStatus.BANNED
-        }
+        // if (descWords.length && findWordsInString(descWords, details.full_description) !== null) {
+        //   update.status = VacancyStatus.BANNED
+        // }
         await client.from(Table.vacancies).update(update).eq('v_id', v.v_id)
         updated++
         console.log(`[${category.name}] updated ${updated}/${Math.min(total, LIMIT)} (v_id=${v.v_id})`)
