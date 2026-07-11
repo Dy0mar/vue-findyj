@@ -1,6 +1,6 @@
 import { HTTPException } from 'hono/http-exception'
 import { DOMParser, Element } from "deno-dom";
-import type { ParsedVacancy, VacancyPageDetails } from "./types.ts";
+import type { ParsedVacancy } from "./types.ts";
 import { SITE_URL } from "./constants.ts";
 import { sleep } from "./utils/time.ts";
 
