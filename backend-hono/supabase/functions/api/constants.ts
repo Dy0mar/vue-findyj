@@ -7,7 +7,6 @@ export const ALLOWED_METHODS: HTTPMethod[] = ['POST', 'PATCH', 'PUT', 'GET', 'DE
 /** PARSER */
 export const SITE_URL = Deno.env.get("SITE_URL")!
 
-
 export enum VacancyStatus {
   NEW = "new",
   INTERESTING = "interesting",
