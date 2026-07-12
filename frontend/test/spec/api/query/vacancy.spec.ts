@@ -1,6 +1,6 @@
 import { http } from "msw";
 import { ref, unref } from "vue";
-import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import type { Pages } from "src/api/query/types";
 import type { VacancyDetailOut } from "src/types/models/vacancy/vacancy";
 import { queryClient } from "src/queryClient";
