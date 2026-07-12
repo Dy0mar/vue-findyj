@@ -63,14 +63,12 @@ describe("VacancyView", () => {
     const router = getRouter();
     await router.setQuery({ category: "Python" });
     const wrapper = render();
-    wrapper
-      .findComponent({ name: "VacancyList" })
-      .vm.$emit("selected", {
-        v_id: 1,
-        link: "https://foo.bar",
-        title: "Test Job",
-        full_description: "Requires English B2 level",
-      });
+    wrapper.findComponent({ name: "VacancyList" }).vm.$emit("selected", {
+      v_id: 1,
+      link: "https://foo.bar",
+      title: "Test Job",
+      full_description: "Requires English B2 level",
+    });
     await wrapper.vm.$nextTick();
     // @ts-expect-error private property
     const html = wrapper.vm.highlightedDesc;
