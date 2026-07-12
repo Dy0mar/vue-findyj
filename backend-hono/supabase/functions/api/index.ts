@@ -11,9 +11,7 @@ import {
   Table
 } from "./client.ts";
 import { loadVacancies } from "./client.ts";
-import { sleep } from "./utils/time.ts";
 import { findWordsInString } from "./utils/search.ts";
-import { extractJobDescription } from "./parser.ts";
 import { supabase } from "./middleware.ts";
 
 export const api = new Hono<{ Variables: AppVariables }>()
@@ -182,70 +180,40 @@ api.get('/stop-words/description/apply', async (c) => {
 
   const client = getClient(c)
 
-  let query;
+  let query = client
+    .from(Table.vacancies)
+    .select('v_id, full_description')
+    .eq('status', VacancyStatus.NEW)
+    .neq('full_description', '')
 
   if (category) {
     const { data: categoryObj } = await fetchCategoryByName(c, category)
     if (!categoryObj) {
       throw new HTTPException(404, { message: `category: ${category} not found` });
     }
-    query = fetchVacanciesByCategoryId(c, categoryObj.id)
-  } else {
-    query = client.from(Table.vacancies).select("*")
+    query = query.eq('category_id', categoryObj.id)
   }
-
-  query = query.neq("status", VacancyStatus.BANNED)
 
   const { data, error } = await query
-  if (error) {
-    throw error
-  }
-
-  const vacancies = data
+  if (error) throw error
 
   const words = await fetchStopWords(c, "descriptionstopword")
-  const bannedVacancies = []
-  const removedVacancies = []
+  const banned: number[] = []
 
-  for (const v of vacancies) {
-    if (!v.link) {
-      continue
+  for (const v of data) {
+    if (v.full_description && findWordsInString(words, v.full_description)) {
+      banned.push(v.v_id)
     }
-
-    const desc = await extractJobDescription(v.link)
-    if (!desc && v.status !== VacancyStatus.APPLIED) {
-      removedVacancies.push(v.v_id)
-      continue
-    }
-    if (!desc) {
-      continue
-    }
-
-    if (findWordsInString(words, desc.description)) {
-      bannedVacancies.push(v.v_id)
-    } else if (desc.salary && desc.salary !== v.salary) {
-      await client.from(Table.vacancies)
-        .update({ salary: desc.salary})
-        .eq("id", v.v_id)
-    }
-    await sleep()
   }
 
-  if (bannedVacancies.length > 0) {
-    await client.from(Table.vacancies)
+  if (banned.length) {
+    await client
+      .from(Table.vacancies)
       .update({ status: VacancyStatus.BANNED })
-      .in("v_id", bannedVacancies)
-  }
-  if (removedVacancies.length > 0) {
-    await client.from(Table.vacancies)
-      .delete()
-      .in("v_id", removedVacancies)
+      .in("v_id", banned)
   }
 
-  return c.json({
-    banned: bannedVacancies,
-    removed: removedVacancies,
-  }, 200)
+  return c.json({ banned }, 200)
 })
 
 
