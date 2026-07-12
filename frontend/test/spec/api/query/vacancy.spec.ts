@@ -1,6 +1,6 @@
 import { http } from "msw";
 import { ref, unref } from "vue";
-import { afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Pages } from "src/api/query/types";
 import type { VacancyDetailOut } from "src/types/models/vacancy/vacancy";
 import { queryClient } from "src/queryClient";
@@ -97,6 +97,42 @@ describe("vacancyQuery", () => {
       const data = { v_id: vacancyId, status: VacancyStatus.BANNED };
       const result = await query.patchVacancy().mutationFn(data);
       expect(result.data).toStrictEqual({ status: VacancyStatus.BANNED });
+    });
+
+    it("should mark entry as read and set full_description by id", async () => {
+      const vacancies = new VacancyDetailOutFactory({ read: false, full_description: null }).paginated(2);
+      const pages = {
+        pages: [vacancies],
+        pageParams: [0],
+      } satisfies Pages<VacancyDetailOut>;
+      queryClient.setQueryData(query.vacanciesList(status, category, search).queryKey, pages);
+
+      await query
+        .patchVacancy()
+        .onMutate({ v_id: vacancies.items[0]!.v_id, read: true, full_description: "<p>desc</p>" });
+      const data = queryClient.getQueryData<Pages<VacancyDetailOut>>(
+        query.vacanciesList(status, category, search).queryKey,
+      );
+      expect(data?.pages[0]?.items[0]).toStrictEqual(
+        expect.objectContaining({ read: true, full_description: "<p>desc</p>" }),
+      );
+    });
+
+    it("should not override full_description in cache when not provided", async () => {
+      const vacancies = new VacancyDetailOutFactory({ read: false, full_description: "<p>existing</p>" }).paginated(2);
+      const pages = {
+        pages: [vacancies],
+        pageParams: [0],
+      } satisfies Pages<VacancyDetailOut>;
+      queryClient.setQueryData(query.vacanciesList(status, category, search).queryKey, pages);
+
+      await query.patchVacancy().onMutate({ v_id: vacancies.items[0]!.v_id, read: true });
+      const data = queryClient.getQueryData<Pages<VacancyDetailOut>>(
+        query.vacanciesList(status, category, search).queryKey,
+      );
+      expect(data?.pages[0]?.items[0]).toStrictEqual(
+        expect.objectContaining({ read: true, full_description: "<p>existing</p>" }),
+      );
     });
 
     it("should mark entry as read by id", async () => {

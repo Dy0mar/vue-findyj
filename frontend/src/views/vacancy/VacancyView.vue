@@ -75,18 +75,18 @@ const highlightedDesc = computed(() => {
 
   <Drawer v-if="isMobile_" v-model:visible="visible" position="right" :show-close-icon="false">
     <template v-if="selected">
-      <h2 class="text-xl font-bold text-gray-800 mb-2">{{ selected.title }}</h2>
-      <p class="text-sm text-gray-500 mb-3">{{ selected.date }}</p>
+      <h2 class="text-xl font-bold text-gray-100 mb-2">{{ selected.title }}</h2>
+      <p class="text-sm text-gray-300 mb-3">{{ selected.date }}</p>
       <a
         :href="selected.link"
         target="_blank"
         rel="noopener noreferrer"
-        class="inline-block mb-3 text-sm text-blue-600 hover:text-blue-800 underline"
+        class="inline-block mb-3 text-sm text-blue-300 hover:text-blue-200 underline"
         >Open original &rarr;</a
       >
-      <div class="text-gray-700 leading-relaxed">
+      <div class="text-gray-200 leading-relaxed">
         <div v-if="selected.full_description" v-html="highlightedDesc" />
-        <span v-else class="text-gray-400">No description yet</span>
+        <span v-else class="text-gray-300">No description yet</span>
       </div>
     </template>
   </Drawer>

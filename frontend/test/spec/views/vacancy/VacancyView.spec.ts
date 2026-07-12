@@ -1,9 +1,9 @@
 import { getRouter } from "vue-router-mock";
 import { describe, expect, it } from "vitest";
 import { sMounter } from "test/utils/options";
+import { getByRole } from "test/utils/selector";
 import { VacancyStatus } from "src/constants";
 import VacancyView from "src/views/vacancy/VacancyView.vue";
-import { getByRole } from "test/utils/selector";
 
 describe("VacancyView", () => {
   const render = sMounter(VacancyView, { global: { stubs: { VacancyList: true } } });
@@ -47,6 +47,47 @@ describe("VacancyView", () => {
     await wrapper.vm.$nextTick();
     // @ts-expect-error private property
     expect(wrapper.vm.selected?.title).toBe("Test Job");
+  });
+
+  it("should not set selected when select called with undefined", async () => {
+    const router = getRouter();
+    await router.setQuery({ category: "Python" });
+    const wrapper = render();
+    wrapper.findComponent({ name: "VacancyList" }).vm.$emit("selected", undefined);
+    await wrapper.vm.$nextTick();
+    // @ts-expect-error private property
+    expect(wrapper.vm.selected).toBeUndefined();
+  });
+
+  it("should highlight keywords in full_description", async () => {
+    const router = getRouter();
+    await router.setQuery({ category: "Python" });
+    const wrapper = render();
+    wrapper
+      .findComponent({ name: "VacancyList" })
+      .vm.$emit("selected", {
+        v_id: 1,
+        link: "https://foo.bar",
+        title: "Test Job",
+        full_description: "Requires English B2 level",
+      });
+    await wrapper.vm.$nextTick();
+    // @ts-expect-error private property
+    const html = wrapper.vm.highlightedDesc;
+    expect(html).toContain('<span class="bg-red-200 text-red-900 font-semibold px-0.5 rounded">English</span>');
+    expect(html).toContain('<span class="bg-red-200 text-red-900 font-semibold px-0.5 rounded">B2</span>');
+  });
+
+  it("should return empty string when full_description is missing", async () => {
+    const router = getRouter();
+    await router.setQuery({ category: "Python" });
+    const wrapper = render();
+    wrapper
+      .findComponent({ name: "VacancyList" })
+      .vm.$emit("selected", { v_id: 1, link: "https://foo.bar", title: "Test Job" });
+    await wrapper.vm.$nextTick();
+    // @ts-expect-error private property
+    expect(wrapper.vm.highlightedDesc).toBe("");
   });
 
   it("should pass correct status to the list component", async () => {

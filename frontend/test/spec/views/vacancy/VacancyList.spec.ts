@@ -1,6 +1,9 @@
 import { http, type JsonBodyType } from "msw";
 import { flushPromises } from "@vue/test-utils";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { ref } from "vue";
+import type { VacancyDetailOut } from "src/types/models/vacancy/vacancy";
+import type { Paginated } from "src/types/models/extra";
 import { aMounter, sMounter } from "test/utils/options";
 import { VacancyDetailOutFactory } from "test/utils/factories/vacancy";
 import { HttpResponse, server } from "test/utils/server";
@@ -8,6 +11,7 @@ import { AxiosResponseFactory } from "test/utils/factories/generic";
 import { getByRole } from "test/utils/selector";
 import { VacancyStatus } from "src/constants";
 import { vacancyQuery } from "src/api/query/vacancy";
+import { queryClient } from "src/queryClient";
 import { bus, EventNames } from "src/bus";
 import VacancyList from "src/views/vacancy/VacancyList.vue";
 
@@ -222,6 +226,97 @@ describe("VacancyList", () => {
       card1?.vm.$emit("change-status", { v_id: 2, status: VacancyStatus.APPLIED });
       await flushPromises();
       expect(spy).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ data: { status: VacancyStatus.APPLIED } }));
+    });
+
+    describe("onCardSelect with missing full_description", () => {
+      const vacancyLink = "https://jobs.example.com/companies/testcorp/vacancies/99/";
+      const exportUrl = "https://jobs.example.com/companies/testcorp/vacancies/export/";
+
+      const page: Paginated<VacancyDetailOut> = {
+        count: 1,
+        items: [
+          {
+            id: 1,
+            v_id: 99,
+            badges: [],
+            title: "Test",
+            description: "test",
+            full_description: null,
+            link: vacancyLink,
+            date: "today",
+            company: "testcorp",
+            salary: null,
+            status: VacancyStatus.NEW,
+            comment: "",
+            cities: "",
+            status_display: "new",
+            read: false,
+            category: "Python",
+          },
+        ],
+      };
+
+      beforeEach(() => {
+        const s = ref<VacancyDetailOut["status"]>(VacancyStatus.NEW as VacancyDetailOut["status"]);
+        const c = ref<VacancyDetailOut["category"]>("Python" as VacancyDetailOut["category"]);
+        const q = ref<string | undefined>(undefined);
+        queryClient.setQueryData(vacancyQuery.vacanciesList(s, c, q).queryKey, { pages: [page], pageParams: [0] });
+      });
+
+      it("should call fetch and emit selected when fetch fails", async () => {
+        const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue({ ok: false } as Response);
+        const wrapper = await render();
+        expect(wrapper.findComponent({ name: "VacancyCard" }).exists()).toBe(true);
+        await wrapper.findComponent({ name: "VacancyCard" }).trigger("click");
+        await flushPromises();
+        expect(fetchSpy).toHaveBeenCalledWith(exportUrl, expect.any(Object));
+        expect(wrapper.emitted("selected")).toBeDefined();
+      });
+
+      it("should call fetch and patch when fetch succeeds", async () => {
+        const desc = "<p>Full job description</p>";
+        server.use(
+          http.patch(vacancyQuery.client.path.detail({ v_id: 99 }), async ({ request }) => {
+            const data = await request.json();
+            return HttpResponse.json(data);
+          }),
+        );
+        const patchSpy = vi.spyOn(vacancyQuery.client, "patchVacancy");
+        vi.spyOn(globalThis, "fetch").mockResolvedValue({
+          ok: true,
+          json: async () => [{ link: vacancyLink, description: desc }],
+        } as Response);
+        const wrapper = await render();
+        expect(wrapper.findComponent({ name: "VacancyCard" }).exists()).toBe(true);
+        await wrapper.findComponent({ name: "VacancyCard" }).trigger("click");
+        await flushPromises();
+        expect(patchSpy).toHaveBeenCalledWith(
+          expect.objectContaining({ data: expect.objectContaining({ full_description: desc }) }),
+        );
+      });
+
+      it("should emit selected without fetch when link has no company", async () => {
+        const badPage = { ...page, items: [{ ...page.items[0]!, link: "https://example.com/no-company-here" }] };
+        const s = ref<VacancyDetailOut["status"]>(VacancyStatus.NEW as VacancyDetailOut["status"]);
+        const c = ref<VacancyDetailOut["category"]>("Python" as VacancyDetailOut["category"]);
+        const q = ref<string | undefined>(undefined);
+        queryClient.setQueryData(vacancyQuery.vacanciesList(s, c, q).queryKey, { pages: [badPage], pageParams: [0] });
+        const wrapper = await render();
+        await wrapper.findComponent({ name: "VacancyCard" }).trigger("click");
+        await flushPromises();
+        expect(wrapper.emitted("selected")).toBeDefined();
+      });
+
+      it("should emit selected when export has no matching vacancy", async () => {
+        vi.spyOn(globalThis, "fetch").mockResolvedValue({
+          ok: true,
+          json: async () => [{ link: "https://other.link", description: "desc" }],
+        } as Response);
+        const wrapper = await render();
+        await wrapper.findComponent({ name: "VacancyCard" }).trigger("click");
+        await flushPromises();
+        expect(wrapper.emitted("selected")).toBeDefined();
+      });
     });
   });
 });
