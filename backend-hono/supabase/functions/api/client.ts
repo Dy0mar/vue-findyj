@@ -48,7 +48,7 @@ export async function loadVacancies(c: AppContext, category: Category) {
 
   const client = getClient(c)
   const ids_ = catItems?.map(({ v_id }) => v_id) ?? []
-  const { vacancies: allVacancies, cookie, csrf } = await fetchVacancies(category.name)
+  const { vacancies: allVacancies } = await fetchVacancies(category.name)
   const words = await fetchStopWords(c, "titlestopword")
 
   const vacancies_to_create = allVacancies
@@ -87,42 +87,6 @@ export async function loadVacancies(c: AppContext, category: Category) {
       throw error;
     }
   }
-
-  // vacancy - update full description and badges
-  /*const { data: emptyDescriptions } = await client
-    .from(Table.vacancies)
-    .select('v_id, link')
-    .eq('category_id', category.id)
-    .eq('full_description', '')
-
-  if (emptyDescriptions) {
-    // const descWords = await fetchStopWords(c, "descriptionstopword")
-    const total = emptyDescriptions.length
-    let updated = 0
-    const LIMIT = 5
-
-    for (const v of emptyDescriptions) {
-      if (!v.link) continue
-      if (updated >= LIMIT) break
-
-      const details = await extractVacancyDetails(v.link, cookie, csrf)
-      if (details) {
-        const update: Record<string, unknown> = {
-          full_description: details.full_description,
-        }
-        // if (descWords.length && findWordsInString(descWords, details.full_description) !== null) {
-        //   update.status = VacancyStatus.BANNED
-        // }
-        await client.from(Table.vacancies).update(update).eq('v_id', v.v_id)
-        console.log(`[${category.name}] updated ${updated}/${Math.min(total, LIMIT)} (v_id=${v.v_id})`)
-      } else {
-        console.log(`[${category.name}] skipped v_id=${v.v_id} (no details)`)
-      }
-      updated++
-
-      await sleep(500 + Math.random() * 1500)
-    }
-  }*/
 
   return {
     created: vacancies_to_create.length,

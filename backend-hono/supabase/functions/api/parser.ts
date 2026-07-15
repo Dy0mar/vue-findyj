@@ -135,35 +135,3 @@ export async function fetchVacancies(category: string): Promise<VacanciesRespons
   }
   return { vacancies, cookie, csrf }
 }
-
-type DescriptionResponseDict = {
-  description: string;
-  salary: string | null;
-};
-
-export async function extractJobDescription(link: string): Promise<DescriptionResponseDict | null> {
-  const headers = makeHeaders();
-
-  const response = await fetch(link, { headers });
-  const html = await response.text();
-
-  const doc = new DOMParser().parseFromString(html, "text/html");
-  if (!doc) return null;
-
-  const inactive = doc.querySelector(".l-vacancy.__inactive");
-  if (inactive) {
-    return null;
-  }
-
-  const section = doc.querySelector(".vacancy-section");
-  if (!section) {
-    return null;
-  }
-
-  const description = section.textContent.trim().toLowerCase();
-
-  const salaryEl = doc.querySelector("span.salary");
-  const salary = salaryEl ? salaryEl.textContent.trim() : null;
-
-  return { description, salary };
-}
