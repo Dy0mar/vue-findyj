@@ -1,5 +1,4 @@
-onlyBuiltDependencies:
-  - '@tailwindcss/oxide'
-  - esbuild
-  - msw
-  - vue-demi
+allowBuilds:
+  esbuild: true
+  msw: true
+  vue-demi: true
