@@ -12,7 +12,6 @@ export default mergeConfig(
       root: fileURLToPath(new URL("./", import.meta.url)),
       // https://vitest.dev/guide/coverage.html
       coverage: {
-        all: true,
         provider: "v8",
         reporter: ["html", "text", "json-summary", "json", "lcov"],
         skipFull: true,
