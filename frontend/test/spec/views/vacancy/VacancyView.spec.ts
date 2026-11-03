@@ -136,5 +136,25 @@ describe("VacancyView", () => {
 
       expect(getByRole(wrapper, "dialog").text()).toContain("Test Job");
     });
+
+    it("sidebar should show vacancy description after select", async () => {
+      Object.defineProperty(window, "innerWidth", { writable: true, value: 500 });
+      const router = getRouter();
+      await router.setQuery({ category: "Python" });
+      const wrapper = render();
+
+      wrapper.findComponent({ name: "VacancyList" }).vm.$emit("selected", {
+        v_id: 1,
+        link: "https://foo.bar",
+        title: "Test Job",
+        badges: [],
+        full_description: "<p>Requires English B2 level</p>",
+      });
+      await wrapper.vm.$nextTick();
+
+      const text = getByRole(wrapper, "dialog").text();
+      expect(text).toContain("Requires English B2 level");
+      expect(text).not.toContain("No description yet");
+    });
   });
 });

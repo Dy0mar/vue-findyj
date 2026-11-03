@@ -177,5 +177,16 @@ describe("AppHeader", () => {
       await flushPromises();
       expect(spy).toHaveBeenCalledExactlyOnceWith(EventNames.REFETCH_VACANCIES, "Created: 2, Removed: 5");
     });
+
+    it("should not call bus event when the request fails", async () => {
+      vi.spyOn(crawlerClient, "runParse").mockRejectedValueOnce(new Error("request failed"));
+      vi.spyOn(console, "error").mockImplementation(() => {});
+      const spy = vi.spyOn(bus, "emit");
+
+      const wrapper = await render();
+      await getByAriaLabel(wrapper, "Fetch new").trigger("click");
+      await flushPromises();
+      expect(spy).not.toHaveBeenCalled();
+    });
   });
 });

@@ -132,6 +132,8 @@ describe("VacancyList", () => {
     it("button load more should make request with offset", async () => {
       const wrapper = await render();
       const spy = vi.spyOn(vacancyQuery.client, "vacanciesList");
+      // the spy instance is reused between tests, drop the call made by the render above
+      spy.mockClear();
       await wrapper.find(loadMoreSelector).trigger("click");
       expect(spy).toHaveBeenCalledExactlyOnceWith({ data: expect.objectContaining({ offset: 10 }) });
     });

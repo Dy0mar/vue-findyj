@@ -2,3 +2,8 @@ allowBuilds:
   esbuild: true
   msw: true
   vue-demi: true
+minimumReleaseAgeExclude:
+  - '@vitest/coverage-v8@5.1.0'
+  - '@vitest/mocker@5.1.0'
+  - '@vitest/spy@5.1.0'
+  - vitest@5.1.0

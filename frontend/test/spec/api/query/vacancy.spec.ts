@@ -224,6 +224,20 @@ describe("vacancyQuery", () => {
       expect(data?.pageParams.length).toBe(0);
     });
 
+    it("should keep the cache untouched when neither read nor status is provided", async () => {
+      const vacancies = new VacancyDetailOutFactory({ status: VacancyStatus.NEW }).paginated(2);
+      const pages = {
+        pages: [vacancies],
+        pageParams: [0],
+      } satisfies Pages<VacancyDetailOut>;
+      queryClient.setQueryData(query.vacanciesList(status, category, search).queryKey, pages);
+
+      const result = await query.patchVacancy().onMutate({ v_id: vacancies.items[0]!.v_id });
+
+      expect(result).toBeUndefined();
+      expect(queryClient.getQueryData(query.vacanciesList(status, category, search).queryKey)).toStrictEqual(pages);
+    });
+
     it("should not remove from cache entries by id if not found", async () => {
       const vacancies = new VacancyDetailOutFactory({ status: VacancyStatus.NEW }).paginated(2);
       const pages = {

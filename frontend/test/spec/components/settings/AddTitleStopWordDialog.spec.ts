@@ -73,6 +73,13 @@ describe("AddTitleStopWordDialog", () => {
       await dialogEmit(wrapper, "save", "foo");
       expect(successMessage).toHaveBeenCalledExactlyOnceWith("Title stop word", "Title stop word added successfully");
     });
+
+    it("should not call 'create' api function for an empty word", async () => {
+      const spy = vi.spyOn(client, "create");
+      const wrapper = render();
+      await dialogEmit(wrapper, "save", "");
+      expect(spy).not.toHaveBeenCalledWith({ data: { word: "" } });
+    });
   });
 
   describe("action apply", () => {

@@ -126,5 +126,15 @@ describe("LoginView", () => {
         }),
       );
     });
+
+    it("should not sign in with empty credentials", async () => {
+      const wrapper = mount(LoginView);
+
+      await wrapper.find("form").trigger("submit.prevent");
+      await flushPromises();
+
+      expect(wrapper.findComponent({ name: "Button" }).props("loading")).toBe(false);
+      expect(toast.add).not.toHaveBeenCalled();
+    });
   });
 });

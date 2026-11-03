@@ -43,6 +43,13 @@ describe("CategoryButtons", () => {
     expect(wrapper.findComponent({ name: "Select" }).props("modelValue")).toBe("bar");
   });
 
+  it("should keep the selection when categories become empty", async () => {
+    const wrapper = render();
+    await wrapper.setProps({ categories: [] });
+    await flushPromises();
+    expect(wrapper.findComponent({ name: "Select" }).props("modelValue")).toBeUndefined();
+  });
+
   describe("Button", () => {
     it("should change query category on button click", async () => {
       const wrapper = render();
