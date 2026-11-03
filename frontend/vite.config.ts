@@ -5,7 +5,7 @@ import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import tailwindcss from "@tailwindcss/vite";
 
-const dst = resolve(__dirname, "dist");
+const dst = resolve(import.meta.dirname, "dist");
 const host = "localhost";
 const port = 3000;
 
@@ -33,14 +33,16 @@ export default defineConfig({
     manifest: true,
     emptyOutDir: true,
     target: "esnext",
-    rollupOptions: {
+    rolldownOptions: {
       output: {
-        manualChunks: {
-          "vue-vendor": ["vue", "vue-router"],
-          primevue: ["primevue"],
-          query: ["@tanstack/vue-query"],
-          supabase: ["@supabase/supabase-js"],
-          axios: ["axios"],
+        codeSplitting: {
+          groups: [
+            { name: "vue-vendor", test: /node_modules[\\/](vue|vue-router)[\\/]/ },
+            { name: "primevue", test: /node_modules[\\/]primevue[\\/]/ },
+            { name: "query", test: /node_modules[\\/]@tanstack[\\/]/ },
+            { name: "supabase", test: /node_modules[\\/]@supabase[\\/]/ },
+            { name: "axios", test: /node_modules[\\/]axios[\\/]/ },
+          ],
         },
       },
     },
